@@ -18,112 +18,10 @@ export const PublicLeaderboardPage: React.FC = () => {
     setLoading(true);
     try {
       const data = await getPublishedLeaderboard(eventId);
-      if (data) {
-        setLeaderboard(data);
-      } else {
-        const defaultStandings: LeaderboardEntry[] = [
-          {
-            rank: 1,
-            teamId: 'team_neuralflux',
-            teamName: 'Team NeuralFlux',
-            problemTitle: 'Edge LLM Inference Cache with Low-Memory Eviction',
-            score: 96.8,
-            roundScores: { 'Round 1': 48.5, 'Round 2': 48.3 },
-            isTie: false,
-            status: 'Approved & Sealed',
-            lastUpdated: new Date().toISOString(),
-          },
-          {
-            rank: 2,
-            teamId: 'team_omnimesh',
-            teamName: 'Team OmniMesh',
-            problemTitle: 'Peer-to-Peer CRDT Distributed Ledger Synchronization',
-            score: 93.8,
-            roundScores: { 'Round 1': 46.8, 'Round 2': 47.0 },
-            isTie: false,
-            status: 'Approved & Sealed',
-            lastUpdated: new Date().toISOString(),
-          },
-          {
-            rank: 3,
-            teamId: 'team_bytecrafters',
-            teamName: 'Team ByteCrafters',
-            problemTitle: 'High-Throughput Stream Compression Protocol',
-            score: 92.5,
-            roundScores: { 'Round 1': 46.5, 'Round 2': 46.0 },
-            isTie: false,
-            status: 'Approved & Sealed',
-            lastUpdated: new Date().toISOString(),
-          },
-          {
-            rank: 4,
-            teamId: 'team_aurora',
-            teamName: 'Team Aurora Innovators',
-            problemTitle: 'Autonomous AST Code Review & Refactoring Engine',
-            score: 89.4,
-            roundScores: { 'Round 1': 44.4, 'Round 2': 45.0 },
-            isTie: false,
-            status: 'Approved & Sealed',
-            lastUpdated: new Date().toISOString(),
-          },
-          {
-            rank: 5,
-            teamId: 'team_krypton',
-            teamName: 'Team KryptonLedger',
-            problemTitle: 'ZK Rollup Cross-Chain Bridge Validator',
-            score: 88.0,
-            roundScores: { 'Round 1': 43.0, 'Round 2': 45.0 },
-            isTie: false,
-            status: 'Approved & Sealed',
-            lastUpdated: new Date().toISOString(),
-          },
-          {
-            rank: 6,
-            teamId: 'team_datamorph',
-            teamName: 'Team DataMorph',
-            problemTitle: 'Dynamic Memory Profiling with Rust WASM',
-            score: 86.5,
-            roundScores: { 'Round 1': 43.5, 'Round 2': 43.0 },
-            isTie: false,
-            status: 'Approved & Sealed',
-            lastUpdated: new Date().toISOString(),
-          },
-          {
-            rank: 7,
-            teamId: 'team_vortex',
-            teamName: 'Team VortexSecurity',
-            problemTitle: 'Binary Disassembly & Symbolic Forensics Sandbox',
-            score: 84.0,
-            roundScores: { 'Round 1': 42.0, 'Round 2': 42.0 },
-            isTie: false,
-            status: 'Approved & Sealed',
-            lastUpdated: new Date().toISOString(),
-          },
-          {
-            rank: 8,
-            teamId: 'team_quantum',
-            teamName: 'Team QuantumShift',
-            problemTitle: 'Post-Quantum Lattice Cryptography Handshake',
-            score: 81.2,
-            roundScores: { 'Round 1': 40.2, 'Round 2': 41.0 },
-            isTie: false,
-            status: 'Approved & Sealed',
-            lastUpdated: new Date().toISOString(),
-          },
-        ];
-
-        setLeaderboard({
-          id: `leaderboard-${eventId}`,
-          eventId,
-          status: 'published',
-          publishedAt: new Date().toISOString(),
-          publishedBy: 'system',
-          standings: defaultStandings,
-          updatedAt: new Date().toISOString(),
-        });
-      }
+      setLeaderboard(data || null);
     } catch (e) {
       console.error(e);
+      setLeaderboard(null);
     } finally {
       setLoading(false);
     }
@@ -334,7 +232,12 @@ export const PublicLeaderboardPage: React.FC = () => {
           </div>
 
           <div className="space-y-3">
-            {filteredStandings.map((team: LeaderboardEntry, idx: number) => (
+            {filteredStandings.length === 0 ? (
+              <div className="text-center py-12 text-stone-500 font-mono text-xs">
+                {search ? 'No cohorts match your filter criteria.' : 'No official leaderboard rankings released yet for this event.'}
+              </div>
+            ) : (
+              filteredStandings.map((team: LeaderboardEntry, idx: number) => (
               <React.Fragment key={team.teamId}>
                 {idx === 3 && (
                   <div className="my-3 p-3 rounded-xl clay-card-yellow border-2 border-amber-400 flex items-center justify-between text-xs font-mono font-black text-stone-900">
@@ -383,7 +286,7 @@ export const PublicLeaderboardPage: React.FC = () => {
                   </div>
                 </div>
               </React.Fragment>
-            ))}
+            )))}
           </div>
         </div>
       </div>

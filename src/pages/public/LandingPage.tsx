@@ -27,14 +27,14 @@ import { getEvents } from '../../services/firestoreService';
 import { HackathonEvent } from '../../types';
 
 export const LandingPage: React.FC = () => {
-  const { user, profile, role, signInWithGoogle, signInWithEmail, quickLoginDemo, logout } = useAuth();
+  const { user, profile, role, signInWithGoogle, signInWithEmail, logout } = useAuth();
   const navigate = useNavigate();
 
   const [events, setEvents] = useState<HackathonEvent[]>([]);
   const [loadingEvents, setLoadingEvents] = useState(true);
   const [showEmailForm, setShowEmailForm] = useState(false);
-  const [email, setEmail] = useState('hacksprint@mit.edu');
-  const [password, setPassword] = useState('git_track_demo2025');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState('');
@@ -83,23 +83,7 @@ export const LandingPage: React.FC = () => {
     }
   };
 
-  const handleQuickDemo = async (targetRole: 'superadmin' | 'admin' | 'participant') => {
-    setAuthLoading(true);
-    setAuthError('');
-    try {
-      await quickLoginDemo(targetRole);
-      setAuthSuccess(`Access granted: ${targetRole.toUpperCase()}! Redirecting...`);
-      setTimeout(() => {
-        if (targetRole === 'superadmin') navigate('/superadmin/dashboard');
-        else if (targetRole === 'admin') navigate('/admin/judging');
-        else navigate('/app/dashboard');
-      }, 400);
-    } catch (err: any) {
-      setAuthError(err.message || 'Demo sign-in failed.');
-    } finally {
-      setAuthLoading(false);
-    }
-  };
+
 
   return (
     <div className="flex flex-col w-full min-h-screen text-stone-900 bg-[#faf9f4]">
@@ -333,47 +317,6 @@ export const LandingPage: React.FC = () => {
                     </svg>
                     <span>{authLoading ? 'Verifying with Google...' : 'Continue with Google'}</span>
                   </button>
-
-                  {/* 1-Tap Clearance Demo Selection (Bauhaus Trio) */}
-                  <div className="clay-card-yellow p-4 flex flex-col gap-2.5 border-2 border-stone-900">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-black text-stone-900 uppercase tracking-wider font-mono flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-amber-500" />
-                        1-Tap Clearance Selection
-                      </span>
-                      <span className="text-[10px] font-mono text-stone-600 font-bold">PROTOTYPE ACCESS</span>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-2">
-                      <button
-                        type="button"
-                        onClick={() => handleQuickDemo('superadmin')}
-                        disabled={authLoading}
-                        className="clay-btn bg-white hover:bg-orange-100 text-stone-900 min-h-[44px] py-2 px-1 text-center font-black text-xs uppercase font-mono cursor-pointer border-2 border-stone-900"
-                        title="Platform Owner: pranavpaunikar.ml24@sbjit.edu.in"
-                      >
-                        👑 Root
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleQuickDemo('admin')}
-                        disabled={authLoading}
-                        className="clay-btn bg-white hover:bg-yellow-100 text-stone-900 min-h-[44px] py-2 px-1 text-center font-black text-xs uppercase font-mono cursor-pointer border-2 border-stone-900"
-                        title="Forensic Analyst"
-                      >
-                        🧪 Analyst
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleQuickDemo('participant')}
-                        disabled={authLoading}
-                        className="clay-btn bg-white hover:bg-green-100 text-stone-900 min-h-[44px] py-2 px-1 text-center font-black text-xs uppercase font-mono cursor-pointer border-2 border-stone-900"
-                        title="Hacker Workspace"
-                      >
-                        🧬 Hacker
-                      </button>
-                    </div>
-                  </div>
 
                   {/* Academic Email Form Accordion */}
                   <div className="border-t-2 border-stone-200 pt-3">

@@ -39,64 +39,59 @@ export const ScoringAndLeaderboardPage: React.FC = () => {
   const [publishing, setPublishing] = useState(false);
   const [published, setPublished] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [standings, setStandings] = useState<LeaderboardEntry[]>([]);
+  const [loadingStandings, setLoadingStandings] = useState(true);
 
   useEffect(() => {
-    getEvents().then((evts) => {
-      if (evts && evts.length > 0) setActiveEvent(evts[0]);
-    });
+    async function init() {
+      try {
+        const evts = await getEvents();
+        if (evts && evts.length > 0) {
+          const evt = evts[0];
+          setActiveEvent(evt);
+          const [teams, evals] = await Promise.all([
+            getTeamsForEvent(evt.id),
+            getEvaluationsForEvent(evt.id),
+          ]);
+
+          const computed: LeaderboardEntry[] = (teams || []).map((t) => {
+            const teamEvals = (evals || []).filter((e) => e.teamId === t.id);
+            const totalScore = teamEvals.length > 0
+              ? Number((teamEvals.reduce((acc, curr) => acc + (curr.totalScore || 0), 0) / teamEvals.length).toFixed(1))
+              : 0;
+            return {
+              rank: 0,
+              teamId: t.id,
+              teamName: t.name,
+              problemTitle: t.problemId || 'General Track',
+              score: totalScore,
+              roundScores: {},
+              isTie: false,
+              status: teamEvals.length > 0 ? 'Evaluated' : 'Pending Evaluation',
+              lastUpdated: new Date().toISOString(),
+            };
+          });
+
+          computed.sort((a, b) => b.score - a.score);
+          computed.forEach((item, idx) => {
+            item.rank = idx + 1;
+          });
+
+          setStandings(computed);
+        }
+      } catch (err) {
+        console.error('Error calculating standings:', err);
+      } finally {
+        setLoadingStandings(false);
+      }
+    }
+    init();
   }, []);
 
   const handlePublish = async () => {
     if (!certified || !activeEvent || !user) return;
     setPublishing(true);
     setFeedback(null);
-
-    const standings: LeaderboardEntry[] = [
-      {
-        rank: 1,
-        teamId: 'team_088',
-        teamName: 'Team HyperSync',
-        problemTitle: 'Distributed Systems',
-        score: 94.2,
-        roundScores: { round_1: 47.1, round_2: 47.1 },
-        isTie: false,
-        status: 'Clean Provenance',
-        lastUpdated: new Date().toISOString(),
-      },
-      {
-        rank: 2,
-        teamId: 'team_104',
-        teamName: 'Team OmniMesh',
-        problemTitle: 'Mesh Networks',
-        score: 93.8,
-        roundScores: { round_1: 46.9, round_2: 46.9 },
-        isTie: false,
-        status: 'Clean Provenance',
-        lastUpdated: new Date().toISOString(),
-      },
-      {
-        rank: 3,
-        teamId: 'team_042',
-        teamName: 'Team ByteCrafters',
-        problemTitle: 'Event Streaming',
-        score: 92.5,
-        roundScores: { round_1: 46.2, round_2: 46.3 },
-        isTie: false,
-        status: 'Clean Provenance',
-        lastUpdated: new Date().toISOString(),
-      },
-      {
-        rank: 4,
-        teamId: 'team_019',
-        teamName: 'Team NeuralFlux',
-        problemTitle: 'Edge Inference',
-        score: 87.0,
-        roundScores: { round_1: 43.5, round_2: 43.5 },
-        isTie: false,
-        status: 'Clean Provenance',
-        lastUpdated: new Date().toISOString(),
-      },
-    ];
 
     try {
       const pubDoc: PublishedLeaderboard = {
@@ -140,12 +135,8 @@ export const ScoringAndLeaderboardPage: React.FC = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          eventTitle: activeEvent?.title || 'HackGrid 2025',
-          standings: [
-            { rank: 1, teamName: 'Team HyperSync', score: 94.2, isTie: false, status: 'Audited', lastUpdated: new Date().toISOString() },
-            { rank: 2, teamName: 'Team OmniMesh', score: 93.8, isTie: false, status: 'Audited', lastUpdated: new Date().toISOString() },
-            { rank: 3, teamName: 'Team ByteCrafters', score: 92.5, isTie: false, status: 'Audited', lastUpdated: new Date().toISOString() },
-          ],
+          eventTitle: activeEvent?.title || 'Hackathon Event',
+          standings,
         }),
       });
       const blob = await res.blob();
@@ -471,89 +462,46 @@ export const ScoringAndLeaderboardPage: React.FC = () => {
         </div>
 
         <div className="space-y-2">
-          {/* Rank 1 */}
-          <div className="bg-surface-container p-3 rounded-xl flex items-center justify-between gap-3 border border-outline-variant/20">
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="w-7 h-7 rounded-lg bg-primary/20 text-primary font-bold text-xs flex items-center justify-center shrink-0">
-                1
-              </div>
-              <div className="min-w-0">
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <span className="font-bold text-xs text-on-surface truncate">Team HyperSync</span>
-                  <span className="px-1.5 py-0.2 rounded bg-secondary/15 text-secondary font-mono text-[10px] flex items-center gap-0.5">
-                    <CheckCircle2 className="w-3 h-3" /> Clean
-                  </span>
+          {loadingStandings ? (
+            <div className="text-center py-6 text-on-surface-variant text-xs font-mono">
+              Calculating cohort standings from live evaluations...
+            </div>
+          ) : standings.length === 0 ? (
+            <div className="text-center py-6 text-on-surface-variant text-xs font-mono">
+              No team submissions or evaluations recorded yet.
+            </div>
+          ) : (
+            standings.slice(0, 10).map((team) => (
+              <div
+                key={team.teamId}
+                className="bg-surface-container p-3 rounded-xl flex items-center justify-between gap-3 border border-outline-variant/20"
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  <div
+                    className={`w-7 h-7 rounded-lg font-bold text-xs flex items-center justify-center shrink-0 ${
+                      team.rank === 1 ? 'bg-primary/20 text-primary' : 'bg-surface-container-high text-on-surface-variant'
+                    }`}
+                  >
+                    {team.rank}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="font-bold text-xs text-on-surface truncate">{team.teamName}</span>
+                      <span className="px-1.5 py-0.2 rounded bg-secondary/15 text-secondary font-mono text-[10px] flex items-center gap-0.5">
+                        <CheckCircle2 className="w-3 h-3" /> {team.status}
+                      </span>
+                    </div>
+                    <span className="font-mono text-[10px] text-outline">ID: {team.teamId}</span>
+                  </div>
                 </div>
-                <span className="font-mono text-[10px] text-outline">ID: #088 • SHA: a410fb • 24 Commits</span>
-              </div>
-            </div>
-            <div className="text-right shrink-0">
-              <div className="font-mono text-sm font-bold text-primary">
-                94.2 <span className="text-[10px] text-on-surface-variant font-normal">PTS</span>
-              </div>
-              <span className="font-mono text-[10px] text-secondary">#1 Seed</span>
-            </div>
-          </div>
-
-          {/* Rank 2 */}
-          <div className="bg-surface-container p-3 rounded-xl flex items-center justify-between gap-3 border border-outline-variant/20">
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="w-7 h-7 rounded-lg bg-surface-container-high text-on-surface-variant font-bold text-xs flex items-center justify-center shrink-0">
-                2
-              </div>
-              <div className="min-w-0">
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <span className="font-bold text-xs text-on-surface truncate">Team OmniMesh</span>
-                  <span className="px-1.5 py-0.2 rounded bg-secondary/15 text-secondary font-mono text-[10px] flex items-center gap-0.5">
-                    <CheckCircle2 className="w-3 h-3" /> Clean
-                  </span>
+                <div className="text-right shrink-0">
+                  <div className="font-mono text-sm font-bold text-primary">
+                    {team.score.toFixed(1)} <span className="text-[10px] text-on-surface-variant font-normal">PTS</span>
+                  </div>
                 </div>
-                <span className="font-mono text-[10px] text-outline">ID: #104 • SHA: 98df31 • 19 Commits</span>
               </div>
-            </div>
-            <div className="text-right shrink-0">
-              <div className="font-mono text-sm font-bold text-primary">
-                93.8 <span className="text-[10px] text-on-surface-variant font-normal">PTS</span>
-              </div>
-              <span className="font-mono text-[10px] text-on-surface-variant font-medium">Δ -0.4</span>
-            </div>
-          </div>
-
-          {/* Rank 3 */}
-          <div className="bg-surface-container p-3 rounded-xl flex items-center justify-between gap-3 border border-outline-variant/20">
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="w-7 h-7 rounded-lg bg-surface-container-high text-on-surface-variant font-bold text-xs flex items-center justify-center shrink-0">
-                3
-              </div>
-              <div className="min-w-0">
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <span className="font-bold text-xs text-on-surface truncate">Team ByteCrafters</span>
-                  <span className="px-1.5 py-0.2 rounded bg-secondary/15 text-secondary font-mono text-[10px] flex items-center gap-0.5">
-                    <CheckCircle2 className="w-3 h-3" /> Clean
-                  </span>
-                </div>
-                <span className="font-mono text-[10px] text-outline">ID: #042 • SHA: dd8412 • 31 Commits</span>
-              </div>
-            </div>
-            <div className="text-right shrink-0">
-              <div className="font-mono text-sm font-bold text-primary">
-                92.5 <span className="text-[10px] text-on-surface-variant font-normal">PTS</span>
-              </div>
-              <span className="font-mono text-[10px] text-on-surface-variant font-medium">Δ -1.7</span>
-            </div>
-          </div>
-
-          {/* Finals Cutoff line */}
-          <div className="my-2 p-2.5 rounded-xl bg-surface-container-highest/60 flex items-center justify-between border border-outline-variant/20">
-            <div className="flex items-center gap-2">
-              <span className="font-mono text-xs text-on-surface font-medium uppercase tracking-wide">
-                Finals Cutoff Line: 78.0 PTS
-              </span>
-            </div>
-            <span className="font-mono text-[10px] text-tertiary bg-tertiary-container/30 px-2 py-0.5 rounded font-semibold">
-              Top 16 Qualify
-            </span>
-          </div>
+            ))
+          )}
         </div>
       </div>
 

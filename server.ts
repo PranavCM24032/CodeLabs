@@ -61,37 +61,20 @@ app.post(['/api/analysis/run-similarity', '/analysis/run-similarity'], (req: Req
   try {
     const { submissionId, teamName, codeSampleA, codeSampleB, otherTeamName } = req.body;
 
-    const sampleA =
-      codeSampleA ||
-      `
-import React, { useState, useEffect } from 'react';
-export function PaymentProcessor({ amount, currency }) {
-  const [status, setStatus] = useState('idle');
-  const handleCheckout = async () => {
-    setStatus('processing');
-    const res = await fetch('/api/pay', { method: 'POST', body: JSON.stringify({ amount, currency }) });
-    if (res.ok) setStatus('success');
-    else setStatus('failed');
-  };
-  return <button onClick={handleCheckout}>Pay {amount} {currency}</button>;
-}
-`;
+    const sampleA = codeSampleA || '';
+    const sampleB = codeSampleB || '';
 
-    const sampleB =
-      codeSampleB ||
-      `
-import React, { useState } from 'react';
-export function PaymentWidget({ total, currencyCode }) {
-  const [state, setState] = useState('idle');
-  const triggerPayment = async () => {
-    setState('processing');
-    const res = await fetch('/api/pay', { method: 'POST', body: JSON.stringify({ amount: total, currency: currencyCode }) });
-    if (res.ok) setState('success');
-    else setState('failed');
-  };
-  return <button onClick={triggerPayment}>Submit {total} {currencyCode}</button>;
-}
-`;
+    if (!sampleA || !sampleB) {
+      return res.json({
+        success: true,
+        submissionId: submissionId || '',
+        similarityScore: 0,
+        findingsCount: 0,
+        findings: [],
+        lateBulkUploadIndicator: false,
+        analyzedAt: new Date().toISOString(),
+      });
+    }
 
     const tokensA = tokenizeCode(sampleA);
     const tokensB = tokenizeCode(sampleB);
@@ -134,14 +117,8 @@ export function PaymentWidget({ total, currencyCode }) {
 // 3. AUTHORIZED CSV EXPORT (Supports GET and POST)
 app.all(['/api/export/leaderboard-csv', '/export/leaderboard-csv'], (req: Request, res: Response) => {
   try {
-    const standings = req.body?.standings || [
-      { rank: 1, teamName: 'Team HyperSync', score: 94.2, isTie: false, status: 'Approved & Sealed', lastUpdated: new Date().toISOString() },
-      { rank: 2, teamName: 'Team OmniMesh', score: 93.8, isTie: false, status: 'Approved & Sealed', lastUpdated: new Date().toISOString() },
-      { rank: 3, teamName: 'Team ByteCrafters', score: 92.5, isTie: false, status: 'Approved & Sealed', lastUpdated: new Date().toISOString() },
-      { rank: 4, teamName: 'Team Aurora Innovators', score: 89.4, isTie: false, status: 'Approved & Sealed', lastUpdated: new Date().toISOString() },
-      { rank: 5, teamName: 'Team KryptonLedger', score: 88.0, isTie: false, status: 'Approved & Sealed', lastUpdated: new Date().toISOString() },
-    ];
-    const eventTitle = req.body?.eventTitle || (req.query.eventId as string) || 'HackGrid_2025';
+    const standings = req.body?.standings || [];
+    const eventTitle = req.body?.eventTitle || (req.query.eventId as string) || 'Hackathon_Event';
 
     const headers = ['Rank', 'Team Name', 'Total Score', 'Tie Indicator', 'Status', 'Last Updated'];
     const rows = standings.map((item: any) => [

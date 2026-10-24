@@ -31,28 +31,46 @@ export const EvaluationFormPage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  // Criteria Scores
-  const [scoreCrit1, setScoreCrit1] = useState<number>(28.5);
-  const [tierCrit1, setTierCrit1] = useState<string>('Exceptional');
-  const [feedbackCrit1, setFeedbackCrit1] = useState(
-    'Clean separation of concerns in stream buffer handling. Proper use of lock-free ring buffers without deadlock vulnerability. Memory footprint tests verify zero allocs inside hot loop.'
-  );
+  const [team, setTeam] = useState<any | null>(null);
+  const [submission, setSubmission] = useState<any | null>(null);
+  const [eventId, setEventId] = useState<string>('hack-2026-global');
 
-  const [scoreCrit2, setScoreCrit2] = useState<number>(38.0);
-  const [tierCrit2, setTierCrit2] = useState<string>('Flawless');
-  const [feedbackCrit2, setFeedbackCrit2] = useState(
-    'Authentic multi-author velocity across all 48 hours. Validated Git SHA signatures with zero late bulk dumps. Commit messages follow conventional standard with linked test iterations.'
-  );
+  // Criteria Scores cleanly initialized
+  const [scoreCrit1, setScoreCrit1] = useState<number>(0);
+  const [tierCrit1, setTierCrit1] = useState<string>('');
+  const [feedbackCrit1, setFeedbackCrit1] = useState('');
 
-  const [scoreCrit3, setScoreCrit3] = useState<number>(26.0);
-  const [tierCrit3, setTierCrit3] = useState<string>('Meets SLA');
-  const [feedbackCrit3, setFeedbackCrit3] = useState(
-    'Stress testing verified throughput with zero packet drops under network partition simulation. Clean code patterns.'
-  );
+  const [scoreCrit2, setScoreCrit2] = useState<number>(0);
+  const [tierCrit2, setTierCrit2] = useState<string>('');
+  const [feedbackCrit2, setFeedbackCrit2] = useState('');
 
-  const [internalJuryNote, setInternalJuryNote] = useState(
-    'Candidate for Top 5 finals presentation. Strong distributed systems fundamentals. Alex demonstrated exceptional mastery of memory barriers during live Q&A.'
-  );
+  const [scoreCrit3, setScoreCrit3] = useState<number>(0);
+  const [tierCrit3, setTierCrit3] = useState<string>('');
+  const [feedbackCrit3, setFeedbackCrit3] = useState('');
+
+  const [internalJuryNote, setInternalJuryNote] = useState('');
+
+  useEffect(() => {
+    async function fetchTeamDetails() {
+      try {
+        const evts = await getEvents();
+        const activeEvtId = evts && evts.length > 0 ? evts[0].id : 'hack-2026-global';
+        setEventId(activeEvtId);
+
+        if (teamId) {
+          const [teamData, subData] = await Promise.all([
+            getTeamById(activeEvtId, teamId),
+            getSubmissionForTeam(activeEvtId, teamId),
+          ]);
+          if (teamData) setTeam(teamData);
+          if (subData) setSubmission(subData);
+        }
+      } catch (err) {
+        console.error('Failed to load team evaluation data:', err);
+      }
+    }
+    fetchTeamDetails();
+  }, [teamId]);
 
   const [submitting, setSubmitting] = useState(false);
   const [finalized, setFinalized] = useState(false);
@@ -64,16 +82,17 @@ export const EvaluationFormPage: React.FC = () => {
     setSubmitting(true);
     setFeedback(null);
     try {
-      const evalId = `eval_${teamId || 'bytecrafters'}_round_1`;
+      const currentTeamName = team?.name || teamId || 'Team Specimen';
+      const evalId = `eval_${teamId || 'unknown'}_round_1`;
       const payload: Evaluation = {
         id: evalId,
-        eventId: 'hack-2026-global',
+        eventId,
         roundId: 'round_1',
-        teamId: teamId || 'team_bytecrafters',
-        teamName: 'Team ByteCrafters',
-        submissionId: 'sub_bytecrafters',
-        judgeId: user?.uid || 'usr_judge_04',
-        judgeEmail: user?.email || 'e.vance@mit.edu',
+        teamId: teamId || 'unknown',
+        teamName: currentTeamName,
+        submissionId: submission?.id || 'sub_default',
+        judgeId: user?.uid || 'usr_anonymous_judge',
+        judgeEmail: user?.email || 'judge@codelab.internal',
         schemaId: 'schema_round_1',
         schemaVersion: 1,
         scores: {
@@ -88,23 +107,23 @@ export const EvaluationFormPage: React.FC = () => {
         },
         totalScore: provisionalTotal,
         provisionalTotal,
-        generalFeedback: feedbackCrit1 + '\n\n' + feedbackCrit3,
+        generalFeedback: feedbackCrit1 + (feedbackCrit3 ? '\n\n' + feedbackCrit3 : ''),
         internalNotes: internalJuryNote,
         status: status === 'submitted' ? 'submitted' : 'draft',
         submittedAt: new Date().toISOString(),
       };
 
-      await saveEvaluation('hack-2026-global', payload);
+      await saveEvaluation(eventId, payload);
 
       if (user) {
         await recordAuditLog({
           actorId: user.uid,
-          actorEmail: user.email || 'e.vance@mit.edu',
+          actorEmail: user.email || 'judge@codelab.internal',
           action: `EVALUATION_${status.toUpperCase()}`,
           entityType: 'Evaluation',
           entityId: evalId,
-          eventId: 'hack-2026-global',
-          details: `Judge Dr. E. Vance (#04) ${status} evaluation for ByteCrafters: ${provisionalTotal}/100 PTS`,
+          eventId,
+          details: `Judge ${user.email} ${status} evaluation for ${currentTeamName}: ${provisionalTotal}/100 PTS`,
         });
       }
 
@@ -112,10 +131,10 @@ export const EvaluationFormPage: React.FC = () => {
         setFinalized(true);
         setFeedback({
           type: 'success',
-          text: `Evaluation finalized (${provisionalTotal}/100 PTS) and cryptographically signed with Judge #04 credentials.`,
+          text: `Evaluation finalized (${provisionalTotal}/100 PTS) successfully.`,
         });
       } else {
-        setFeedback({ type: 'success', text: 'Evaluation draft autosaved successfully.' });
+        setFeedback({ type: 'success', text: 'Evaluation draft saved successfully.' });
       }
     } catch (err: any) {
       setFeedback({ type: 'error', text: err.message || 'Failed to save evaluation.' });
@@ -164,12 +183,16 @@ export const EvaluationFormPage: React.FC = () => {
         <div className="flex items-start justify-between gap-3">
           <div className="flex flex-col min-w-0">
             <div className="flex items-center gap-2">
-              <h1 className="text-xl sm:text-2xl font-bold text-on-surface tracking-tight">Team ByteCrafters</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-on-surface tracking-tight">
+                {team?.name || 'Evaluation Target'}
+              </h1>
               <span className="bg-surface-container-highest text-primary font-mono text-[10px] px-2 py-0.5 rounded border border-outline-variant/20">
-                #BC-408
+                {team?.code || `#${(teamId || 'TEAM').slice(-6)}`}
               </span>
             </div>
-            <p className="text-xs text-on-surface-variant mt-0.5">PS-04 High-Throughput Event Streaming</p>
+            <p className="text-xs text-on-surface-variant mt-0.5">
+              {team?.problemId ? `Problem Track: ${team.problemId}` : 'Track Evaluation'}
+            </p>
           </div>
           <span className="bg-primary-container/20 text-primary font-mono text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider border border-primary-container/30">
             {finalized ? 'Finalized' : 'Draft In Progress'}
@@ -180,18 +203,20 @@ export const EvaluationFormPage: React.FC = () => {
         <div className="flex items-center justify-between bg-surface-container-low rounded-xl p-3 border border-outline-variant/20">
           <div className="flex items-center gap-2.5">
             <div className="w-7 h-7 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-xs shrink-0">
-              AZ
+              {(team?.name || 'T').slice(0, 2).toUpperCase()}
             </div>
             <div className="flex flex-col text-xs">
-              <span className="font-semibold text-on-surface leading-tight">Lead: Alex Zhang + 3</span>
+              <span className="font-semibold text-on-surface leading-tight">
+                Lead: {team?.members?.[0]?.displayName || team?.leaderEmail || 'Lead Member'}
+              </span>
               <span className="font-mono text-[10px] text-on-surface-variant leading-tight">
-                Repo: bytecrafters/stream-mesh
+                {submission?.repoUrl ? `Repo: ${submission.repoUrl}` : 'No repository linked yet'}
               </span>
             </div>
           </div>
           <div className="flex items-center gap-1.5 font-mono text-[11px] text-secondary">
             <span className="w-2 h-2 rounded-full bg-secondary" />
-            <span>Verified Build</span>
+            <span>{submission?.status === 'submitted' ? 'Submitted Specimen' : 'Active Evaluation'}</span>
           </div>
         </div>
 

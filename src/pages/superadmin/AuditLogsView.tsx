@@ -11,47 +11,7 @@ export const AuditLogsViewPage: React.FC = () => {
 
   useEffect(() => {
     getAuditLogs().then((list) => {
-      if (list && list.length > 0) {
-        setLogs(list);
-      } else {
-        // Fallback demo audit history
-        const demoLogs: AuditLog[] = [
-          {
-            id: 'log_01',
-            actorId: 'admin_sys',
-            actorEmail: 'pranavpaunikar.ml24@sbjit.edu.in',
-            action: 'SCHEMA_PUBLISHED',
-            entityType: 'EvaluationSchema',
-            entityId: 'schema_round_1',
-            details: 'Published dynamic rubric schema v1 with 3 criteria (Max Marks: 50)',
-            reason: 'Official round 1 criteria release',
-            timestamp: new Date(Date.now() - 7200000).toISOString(),
-          },
-          {
-            id: 'log_02',
-            actorId: 'admin_sys',
-            actorEmail: 'pranavpaunikar.ml24@sbjit.edu.in',
-            action: 'ROLE_CHANGE_ADMIN',
-            entityType: 'User',
-            entityId: 'usr_judge_alex',
-            details: 'Granted Admin-Judge evaluation permissions to alex.judge@mit.edu',
-            reason: 'Appointed as technical track judge',
-            timestamp: new Date(Date.now() - 14400000).toISOString(),
-          },
-          {
-            id: 'log_03',
-            actorId: 'admin_sys',
-            actorEmail: 'pranavpaunikar.ml24@sbjit.edu.in',
-            action: 'LEADERBOARD_PUBLISHED',
-            entityType: 'Leaderboard',
-            entityId: 'published',
-            details: 'Sealed official rankings for ByteHacks Global 2026',
-            reason: 'Completion of evaluation round',
-            timestamp: new Date(Date.now() - 28800000).toISOString(),
-          },
-        ];
-        setLogs(demoLogs);
-      }
+      setLogs(list || []);
       setLoading(false);
     });
   }, []);

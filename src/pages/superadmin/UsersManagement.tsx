@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   ShieldCheck,
   Search,
@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { getAllUsers, getAuditLogs, updateUserRole } from '../../services/firestoreService';
 
 export const UsersManagementPage: React.FC = () => {
   const { user } = useAuth();
@@ -25,74 +26,53 @@ export const UsersManagementPage: React.FC = () => {
   const [search, setSearch] = useState('');
   const [copiedSha, setCopiedSha] = useState<string | null>(null);
 
-  // Dynamic user list mock
-  const [users, setUsers] = useState([
-    {
-      id: 'usr_01',
-      name: 'Dr. Evelyn Vance',
-      email: 'e.vance@mit.edu',
-      role: 'admin',
-      scope: 'HackGrid 2025 R1',
-      status: 'active',
-      evalsDone: 14,
-      verified: true,
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&h=120&q=80',
-    },
-    {
-      id: 'usr_02',
-      name: 'Alex Zhang',
-      email: 'alex.z@campus.edu',
-      role: 'participant',
-      team: 'ByteCrafters',
-      status: 'active',
-      evalsDone: 0,
-      verified: true,
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&h=120&q=80',
-    },
-    {
-      id: 'usr_03',
-      name: 'Marcus Brody',
-      email: 'm.brody@external-audit.org',
-      role: 'pending_admin',
-      nomination: 'Systems Track Judging Panel',
-      status: 'active',
-      evalsDone: 0,
-      verified: false,
-      avatar: null,
-    },
-  ]);
+  const [users, setUsers] = useState<any[]>([]);
+  const [auditLogs, setAuditLogs] = useState<any[]>([]);
 
-  const [auditLogs, setAuditLogs] = useState([
-    {
-      id: '#9802',
-      action: 'SCORE_OVERRIDE_APPLIED',
-      actor: 'Superadmin (#root)',
-      target: 'ByteCrafters',
-      time: '14m ago',
-      criterion: 'CRIT-03',
-      oldPoints: '24.0',
-      newPoints: '26.0 PTS',
-      reason: 'Automated CI synthetic benchmark run re-verified under low network latency.',
-      sha: 'd83b7f1',
-    },
-    {
-      id: '#9801',
-      action: 'ADMIN_ROLE_GRANTED',
-      actor: 'Superadmin (#root)',
-      target: 'Scope: HackGrid 2025 R1',
-      time: '2h ago',
-      beneficiary: 'e.vance@mit.edu',
-      sha: '40a92b7',
-    },
-    {
-      id: '#9800',
-      action: 'SCHEMA_VERSION_PUBLISHED',
-      actor: 'Superadmin (#root)',
-      target: 'Schema Title: Collegiate Technical v2.4 (SEALED)',
-      time: '5h ago',
-      sha: '11c82e0',
-    },
-  ]);
+  useEffect(() => {
+    async function load() {
+      try {
+        const [uList, logList] = await Promise.all([
+          getAllUsers(),
+          getAuditLogs(),
+        ]);
+        if (uList) {
+          setUsers(
+            uList.map((u) => ({
+              id: u.uid,
+              name: u.displayName || u.email?.split('@')[0] || 'User',
+              email: u.email,
+              role: u.role,
+              scope: 'Platform User',
+              status: u.status || 'active',
+              evalsDone: 0,
+              verified: true,
+              avatar: u.photoURL || null,
+            }))
+          );
+        }
+        if (logList) {
+          setAuditLogs(
+            logList.map((l) => ({
+              id: l.id.slice(-6),
+              action: l.action,
+              actor: l.actorEmail,
+              target: l.entityType,
+              time: new Date(l.timestamp).toLocaleTimeString(),
+              criterion: l.entityId,
+              oldPoints: '-',
+              newPoints: '-',
+              reason: l.details || l.reason || '',
+              sha: l.id.slice(0, 7),
+            }))
+          );
+        }
+      } catch (err) {
+        console.error('Failed to load users management data:', err);
+      }
+    }
+    load();
+  }, []);
 
   const handleCopySha = (sha: string) => {
     navigator.clipboard.writeText(sha);
@@ -100,16 +80,26 @@ export const UsersManagementPage: React.FC = () => {
     setTimeout(() => setCopiedSha(null), 2000);
   };
 
-  const handleGrantAdmin = (userId: string) => {
-    setUsers((prev) =>
-      prev.map((u) => (u.id === userId ? { ...u, role: 'admin' } : u))
-    );
+  const handleGrantAdmin = async (userId: string) => {
+    try {
+      await updateUserRole(userId, 'admin', user?.email || 'superadmin');
+      setUsers((prev) =>
+        prev.map((u) => (u.id === userId ? { ...u, role: 'admin' } : u))
+      );
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const handleRevokeAdmin = (userId: string) => {
-    setUsers((prev) =>
-      prev.map((u) => (u.id === userId ? { ...u, role: 'participant' } : u))
-    );
+  const handleRevokeAdmin = async (userId: string) => {
+    try {
+      await updateUserRole(userId, 'participant', user?.email || 'superadmin');
+      setUsers((prev) =>
+        prev.map((u) => (u.id === userId ? { ...u, role: 'participant' } : u))
+      );
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const filteredUsers = users.filter((u) => {

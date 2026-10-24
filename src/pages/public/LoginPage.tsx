@@ -17,7 +17,7 @@ import { useAuth, OWNER_EMAIL } from '../../context/AuthContext';
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
-  const { signInWithGoogle, signInWithEmail, quickLoginDemo } = useAuth();
+  const { signInWithGoogle, signInWithEmail } = useAuth();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -53,20 +53,6 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  const handleQuickDemo = async (targetRole: 'superadmin' | 'admin' | 'participant') => {
-    setLoading(true);
-    setError('');
-    try {
-      await quickLoginDemo(targetRole);
-      if (targetRole === 'superadmin') navigate('/superadmin/dashboard');
-      else if (targetRole === 'admin') navigate('/admin/judging');
-      else navigate('/app/dashboard');
-    } catch (err: any) {
-      setError(err.message || 'Quick login failed.');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center px-4 py-8 sm:py-12 text-stone-900 bg-[#faf9f4]">
@@ -123,37 +109,6 @@ export const LoginPage: React.FC = () => {
             </svg>
             <span>{loading ? 'Synthesizing...' : 'Continue with Google'}</span>
           </button>
-
-          {/* Instant 1-Click Role Testing Clearance */}
-          <div className="clay-card-yellow p-4 flex flex-col gap-2.5 border-2 border-stone-900">
-            <span className="font-mono text-[10px] text-stone-900 uppercase tracking-widest font-black flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-amber-500" />
-              1-Tap Clearance Demo
-            </span>
-            <div className="grid grid-cols-3 gap-2 text-xs font-mono font-black">
-              <button
-                type="button"
-                onClick={() => handleQuickDemo('superadmin')}
-                className="clay-btn bg-white hover:bg-orange-100 text-stone-900 min-h-[44px] py-2 px-1 border-2 border-stone-900 uppercase transition-all text-center"
-              >
-                👑 Root
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickDemo('admin')}
-                className="clay-btn bg-white hover:bg-yellow-100 text-stone-900 min-h-[44px] py-2 px-1 border-2 border-stone-900 uppercase transition-all text-center"
-              >
-                🧪 Analyst
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickDemo('participant')}
-                className="clay-btn bg-white hover:bg-green-100 text-stone-900 min-h-[44px] py-2 px-1 border-2 border-stone-900 uppercase transition-all text-center"
-              >
-                🧬 Hacker
-              </button>
-            </div>
-          </div>
 
           <div className="relative flex py-1 items-center">
             <div className="flex-grow border-t-2 border-stone-200" />
