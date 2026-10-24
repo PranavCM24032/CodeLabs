@@ -223,7 +223,7 @@ const logout = async () => {
         signInWithGoogle,
         signInWithEmail,
         registerWithEmail,
-        logout,\nlogout,
+        logout,
         bootstrapOwnerAsSuperadmin,
         isOwnerEmail,
         refreshProfile,
