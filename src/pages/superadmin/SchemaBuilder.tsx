@@ -7,7 +7,7 @@ export const SchemaBuilderPage: React.FC = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'visual' | 'json' | 'preview'>('visual');
   const [doubleBlind, setDoubleBlind] = useState(true);
-  const [schemaName, setSchemaName] = useState('Technical Forensics & Architecture Schema');
+  const [schemaName, setSchemaName] = useState('Technical & Architecture Evaluation Schema');
   const [roundName, setRoundName] = useState('Round 1: Preliminary Code & Prototype Audit');
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -31,7 +31,7 @@ export const SchemaBuilderPage: React.FC = () => {
     },
     {
       id: 'crit-02',
-      label: 'CRIT-02: Repository Forensics & Cadence',
+      label: 'CRIT-02: Repository Activity & Commit Cadence',
       description: 'Authentic multi-author velocity across timeline. Validated Git SHA signatures with zero late bulk dumps.',
       weight: 40,
       maxMarks: 40,

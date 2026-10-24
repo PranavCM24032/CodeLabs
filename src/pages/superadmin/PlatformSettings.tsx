@@ -26,13 +26,13 @@ export const PlatformSettingsPage: React.FC = () => {
         </Link>
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-300 font-mono text-[11px] font-bold mb-2 shadow-xs">
           <FlaskConical className="w-3.5 h-3.5 text-amber-700" />
-          <span>codeLab Chemical Engine</span>
+          <span>codeLab Platform</span>
         </div>
         <h1 className="text-2xl sm:text-3xl font-black text-stone-900 tracking-tight">
-          Laboratory & Infrastructure Settings
+          Platform & Infrastructure Settings
         </h1>
         <p className="text-xs sm:text-sm text-stone-600 mt-1">
-          Forensics engine parameters, Firebase cloud environment, and specimen analysis hooks.
+          Firebase cloud environment, API endpoints, and platform configuration.
         </p>
       </div>
 
@@ -45,7 +45,7 @@ export const PlatformSettingsPage: React.FC = () => {
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
             <div className="p-4 rounded-2xl bg-amber-50/80 border border-amber-200">
-              <span className="text-stone-500 font-semibold block mb-1">Root Lab Director</span>
+              <span className="text-stone-500 font-semibold block mb-1">Root Director</span>
               <span className="font-mono font-black text-stone-900">{OWNER_EMAIL}</span>
             </div>
             <div className="p-4 rounded-2xl bg-amber-50/80 border border-amber-200">
@@ -59,7 +59,7 @@ export const PlatformSettingsPage: React.FC = () => {
         <div className="clay-card p-6 sm:p-8">
           <h2 className="text-base font-black text-stone-900 mb-4 flex items-center gap-2">
             <Server className="w-5 h-5 text-emerald-700" />
-            Forensics Infrastructure & Reagents
+            Backend Infrastructure & Services
           </h2>
 
           <div className="space-y-3 text-xs">
@@ -97,7 +97,7 @@ export const PlatformSettingsPage: React.FC = () => {
               <div className="flex items-center gap-3">
                 <Server className="w-5 h-5 text-emerald-700" />
                 <div>
-                  <div className="font-black text-stone-900">codeLab Express Forensics Proxy</div>
+                  <div className="font-black text-stone-900">codeLab Express API Proxy</div>
                   <div className="text-stone-500 font-mono text-[11px]">
                     Endpoints: /api/repo/inspect & /api/analysis/run-similarity
                   </div>

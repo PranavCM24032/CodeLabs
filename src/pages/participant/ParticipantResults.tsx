@@ -98,10 +98,10 @@ export const ParticipantResultsPage: React.FC = () => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-black text-stone-900 tracking-tight">
-              Specimen Synthesis Evaluation
+              Evaluation Results
             </h1>
             <p className="text-xs sm:text-sm text-stone-600 mt-1">
-              {activeEvent?.title || 'Active Hackathon'} • Verified Chemical Forensic Assays
+              {activeEvent?.title || 'Active Hackathon'} • Official Results
             </p>
           </div>
 
@@ -118,7 +118,7 @@ export const ParticipantResultsPage: React.FC = () => {
               className="clay-btn-primary px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-1.5"
             >
               <Download className="w-3.5 h-3.5" />
-              <span>Print Assay Dossier</span>
+              <span>Download Results</span>
             </button>
           </div>
         </div>
@@ -129,13 +129,13 @@ export const ParticipantResultsPage: React.FC = () => {
           <div className="w-12 h-12 rounded-2xl bg-amber-200/90 border border-amber-300 flex items-center justify-center text-amber-900 mx-auto shadow-xs">
             <AlertCircle className="w-6 h-6" />
           </div>
-          <h2 className="text-lg font-black text-stone-900">No Specimen Squad Enrolled</h2>
+          <h2 className="text-lg font-black text-stone-900">No Team Enrolled</h2>
           <p className="text-xs text-stone-600 max-w-md mx-auto">
-            You must form or enter a research squad to view evaluations and official standings.
+            You must form or join a team to view evaluations and official standings.
           </p>
           <div>
             <Link to="/app/teams" className="clay-btn-orange px-5 py-2.5 rounded-2xl text-xs font-bold inline-block">
-              Form Specimen Squad
+              Form a Team
             </Link>
           </div>
         </div>
@@ -144,9 +144,9 @@ export const ParticipantResultsPage: React.FC = () => {
           <div className="w-12 h-12 rounded-2xl bg-stone-100 border border-stone-200 flex items-center justify-center text-stone-700 mx-auto">
             <Clock className="w-6 h-6 text-amber-700" />
           </div>
-          <h2 className="text-lg font-black text-stone-900">Catalytic Review in Progress</h2>
+          <h2 className="text-lg font-black text-stone-900">Review in Progress</h2>
           <p className="text-xs text-stone-600 max-w-md mx-auto leading-relaxed">
-            Squad <strong className="text-stone-900">{userTeam.name}</strong>'s sealed specimen is currently queued for forensic chromatography review by assigned laboratory analysts.
+            Team <strong className="text-stone-900">{userTeam.name}</strong>'s submission is currently under review by the assigned judges.
           </p>
           {submission?.frozenCommitSha ? (
             <div className="p-3 rounded-xl bg-stone-50 border border-stone-200 inline-block font-mono text-xs text-stone-700">
@@ -155,7 +155,7 @@ export const ParticipantResultsPage: React.FC = () => {
           ) : (
             <div>
               <Link to="/app/submissions" className="clay-btn-orange px-5 py-2.5 rounded-2xl text-xs font-bold inline-block">
-                Submit Specimen Before Freeze
+                Submit Project Before Deadline
               </Link>
             </div>
           )}
@@ -175,13 +175,13 @@ export const ParticipantResultsPage: React.FC = () => {
                 {userTeam.name}
               </h2>
               <p className="text-xs text-emerald-800 mt-1 font-semibold">
-                Lead Analyst: {evaluation.judgeEmail} • Status: {evaluation.status.toUpperCase()}
+                Lead Judge: {evaluation.judgeEmail} • Status: {evaluation.status.toUpperCase()}
               </p>
             </div>
 
             <div className="p-5 rounded-2xl bg-white/80 border border-emerald-200 text-center shadow-xs min-w-[140px]">
               <span className="block font-mono text-[10px] font-black uppercase tracking-wider text-emerald-800">
-                SYNTHESIS SCORE
+                FINAL SCORE
               </span>
               <div className="text-4xl font-black text-emerald-950 font-mono mt-1">
                 {evaluation.totalScore}
@@ -194,7 +194,7 @@ export const ParticipantResultsPage: React.FC = () => {
           <div className="clay-card p-6 space-y-5">
             <h3 className="text-sm font-black text-stone-900 uppercase tracking-wider flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-emerald-700" />
-              <span>Multi-Reagent Rubric Scores</span>
+              <span>Rubric Scores Breakdown</span>
             </h3>
 
             <div className="space-y-4">
@@ -226,13 +226,13 @@ export const ParticipantResultsPage: React.FC = () => {
 
             {evaluation.generalFeedback && (
               <div className="p-4 rounded-2xl bg-amber-50/80 border border-amber-200 text-xs text-amber-950">
-                <span className="font-bold block mb-1 text-amber-900">Lead Analyst Feedback:</span>
+                <span className="font-bold block mb-1 text-amber-900">Lead Judge Feedback:</span>
                 <p className="leading-relaxed">{evaluation.generalFeedback}</p>
               </div>
             )}
           </div>
 
-          {/* Specimen Provenance Details */}
+          {/* Submission Provenance Details */}
           {submission && (
             <div className="clay-card-yellow p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>

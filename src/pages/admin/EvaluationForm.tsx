@@ -145,7 +145,7 @@ export const EvaluationFormPage: React.FC = () => {
 
   return (
     <div className="flex flex-col w-full pb-28 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 space-y-4 text-on-surface">
-      {/* Micro Top Forensic Sub-header */}
+      {/* Evaluation Sub-header */}
       <div className="flex items-center justify-between py-1 text-on-surface-variant font-mono text-xs">
         <div className="flex items-center gap-1.5 min-w-0">
           <Link to="/admin/judging" className="hover:text-primary transition-colors flex items-center gap-1">
@@ -153,7 +153,7 @@ export const EvaluationFormPage: React.FC = () => {
             <span>Queue</span>
           </Link>
           <span>/</span>
-          <span className="text-on-surface truncate">Eval: R1 Forensics</span>
+          <span className="text-on-surface truncate">Eval: R1 Code Review</span>
         </div>
         <div className="flex items-center gap-1 bg-surface-container-high px-2 py-0.5 rounded text-tertiary text-[10px]">
           <span className="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse" />
@@ -216,7 +216,7 @@ export const EvaluationFormPage: React.FC = () => {
           </div>
           <div className="flex items-center gap-1.5 font-mono text-[11px] text-secondary">
             <span className="w-2 h-2 rounded-full bg-secondary" />
-            <span>{submission?.status === 'submitted' ? 'Submitted Specimen' : 'Active Evaluation'}</span>
+            <span>{submission?.status === 'submitted' ? 'Submitted' : 'Active Evaluation'}</span>
           </div>
         </div>
 
@@ -248,7 +248,7 @@ export const EvaluationFormPage: React.FC = () => {
               <span className="w-1.5 h-1.5 rounded-full bg-secondary" /> Arch {scoreCrit1}
             </span>
             <span className="flex items-center gap-1 text-tertiary">
-              <span className="w-1.5 h-1.5 rounded-full bg-tertiary" /> Forensics {scoreCrit2}
+              <span className="w-1.5 h-1.5 rounded-full bg-tertiary" /> Repo Activity {scoreCrit2}
             </span>
             <span className="flex items-center gap-1 text-primary">
               <span className="w-1.5 h-1.5 rounded-full bg-primary" /> Benchmark {scoreCrit3}
@@ -364,7 +364,7 @@ export const EvaluationFormPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Criterion 2: Repository Forensics */}
+      {/* Criterion 2: Repository Activity */}
       <section className="bg-surface-container rounded-2xl p-4 shadow-sm flex flex-col gap-3 border border-outline-variant/30">
         <div className="flex items-start justify-between gap-2">
           <div>
@@ -372,7 +372,7 @@ export const EvaluationFormPage: React.FC = () => {
               <span className="font-mono text-[10px] bg-surface-container-highest px-2 py-0.5 rounded text-on-surface font-bold">
                 CRIT 02
               </span>
-              <h3 className="font-bold text-sm text-on-surface">Repository Forensics & Cadence</h3>
+              <h3 className="font-bold text-sm text-on-surface">Repository Activity & Cadence</h3>
             </div>
             <p className="text-xs text-on-surface-variant mt-1 leading-relaxed">
               Authentic commit history, regular commit velocity across timeline, no eleventh-hour bulk dumps.

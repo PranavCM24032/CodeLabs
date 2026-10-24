@@ -72,15 +72,15 @@ export const AdminReportsPage: React.FC = () => {
           to="/admin/dashboard"
           className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-800 hover:text-amber-900 mb-3"
         >
-          <ArrowLeft className="w-3.5 h-3.5" /> Back to Analyst Dashboard
+          <ArrowLeft className="w-3.5 h-3.5" /> Back to Judge Dashboard
         </Link>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-black text-stone-900 tracking-tight">
-              Chemical Synthesis & Assays Report
+              Evaluation Reports & Analytics
             </h1>
             <p className="text-xs sm:text-sm text-stone-600 mt-1">
-              Specimen evaluation velocity, catalytic completion rates, and scoring distribution for {activeEvent?.title || 'active event'}.
+              Evaluation completion rates and scoring distribution for {activeEvent?.title || 'active event'}.
             </p>
           </div>
           <button
@@ -88,14 +88,14 @@ export const AdminReportsPage: React.FC = () => {
             className="clay-btn-yellow self-start sm:self-auto px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2"
           >
             <Download className="w-4 h-4 text-amber-800" />
-            <span>Export Assays Ledger (CSV)</span>
+            <span>Export Results (CSV)</span>
           </button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
         <div className="clay-card-green p-6">
-          <span className="text-xs font-bold text-emerald-900 block mb-1">Reagent Assay Completion</span>
+          <span className="text-xs font-bold text-emerald-900 block mb-1">Evaluation Completion</span>
           <div className="text-3xl font-black text-emerald-950 font-mono">{completionRate}%</div>
           <div className="w-full bg-emerald-200/80 h-2.5 rounded-full overflow-hidden mt-3 border border-emerald-300">
             <div className="bg-emerald-600 h-full rounded-full transition-all duration-700" style={{ width: `${completionRate}%` }} />

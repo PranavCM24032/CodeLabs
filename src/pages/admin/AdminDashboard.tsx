@@ -69,13 +69,13 @@ export const AdminDashboard: React.FC = () => {
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-200/80 text-amber-900 border border-amber-300 font-mono text-xs font-bold mb-3 shadow-xs">
               <FlaskConical className="w-4 h-4 text-amber-700" />
-              codeLab Analyst Station • {activeEvent?.title || 'Active Hackathon'}
+              codeLab Judge Station • {activeEvent?.title || 'Active Hackathon'}
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-stone-900 tracking-tight">
-              Specimen Evaluation & Chromatography Queue
+              Evaluation & Judging Queue
             </h1>
             <p className="text-xs sm:text-sm text-stone-700 mt-1 max-w-xl leading-relaxed">
-              Analyze sealed specimen commits, verify chemical code chromatography, and apply catalytic rubric scores with full provenance assurance.
+              Review submitted team projects, apply rubric scores, and finalize evaluations with full audit trail.
             </p>
           </div>
 
@@ -94,18 +94,16 @@ export const AdminDashboard: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
         <div className="clay-card p-5">
           <div className="flex justify-between items-center text-xs font-bold text-stone-600 mb-1">
-            <span>Intake Squads</span>
-            <span className="p-2 rounded-xl bg-amber-100 text-amber-800 border border-amber-200">
-              <ShieldCheck className="w-4 h-4" />
-            </span>
+            <span>Registered Teams</span>
+            ...
           </div>
           <div className="text-3xl font-black text-stone-900 font-mono mt-1">{teams.length}</div>
-          <p className="text-[11px] font-semibold text-stone-500 mt-1">Across laboratory tracks</p>
+          <p className="text-[11px] font-semibold text-stone-500 mt-1">Across all challenge tracks</p>
         </div>
 
         <div className="clay-card p-5">
           <div className="flex justify-between items-center text-xs font-bold text-stone-600 mb-1">
-            <span>Sealed Specimens</span>
+            <span>Submitted Projects</span>
             <span className="p-2 rounded-xl bg-emerald-100 text-emerald-800 border border-emerald-200">
               <GitPullRequest className="w-4 h-4" />
             </span>
@@ -116,24 +114,20 @@ export const AdminDashboard: React.FC = () => {
 
         <div className="clay-card-orange p-5">
           <div className="flex justify-between items-center text-xs font-bold text-orange-900 mb-1">
-            <span>Catalytic Review Pending</span>
-            <span className="p-2 rounded-xl bg-orange-200 text-orange-900 border border-orange-300">
-              <Clock className="w-4 h-4" />
-            </span>
+            <span>Review Pending</span>
+            ...
           </div>
           <div className="text-3xl font-black text-orange-950 font-mono mt-1">{pendingCount}</div>
-          <p className="text-[11px] font-semibold text-orange-800 mt-1">Awaiting multi-reagent scoring</p>
+          <p className="text-[11px] font-semibold text-orange-800 mt-1">Awaiting scoring</p>
         </div>
 
         <div className="clay-card-green p-5">
           <div className="flex justify-between items-center text-xs font-bold text-emerald-900 mb-1">
-            <span>Synthesized Evaluations</span>
-            <span className="p-2 rounded-xl bg-emerald-200 text-emerald-900 border border-emerald-300">
-              <CheckCircle2 className="w-4 h-4" />
-            </span>
+            <span>Completed Evaluations</span>
+            ...
           </div>
           <div className="text-3xl font-black text-emerald-950 font-mono mt-1">{completedCount}</div>
-          <p className="text-[11px] font-semibold text-emerald-800 mt-1">Sealed & finalized assays</p>
+          <p className="text-[11px] font-semibold text-emerald-800 mt-1">Finalized & sealed</p>
         </div>
       </div>
 
@@ -148,14 +142,14 @@ export const AdminDashboard: React.FC = () => {
               <FlaskConical className="w-6 h-6" />
             </div>
             <h3 className="text-base font-black text-stone-900 group-hover:text-amber-800 transition-colors">
-              Specimen Judging Queue
+              Judging Queue
             </h3>
             <p className="text-xs text-stone-600 mt-1.5 leading-relaxed">
-              Review assigned team specimens, enter chemical scores across rubrics, and lock evaluation certificates.
+              Review assigned team submissions, score across rubric criteria, and lock evaluation results.
             </p>
           </div>
           <div className="mt-5 flex items-center gap-1.5 text-xs font-bold text-amber-800">
-            <span>Open Reagent Queue</span>
+            <span>Open Judging Queue</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </div>
         </Link>
@@ -169,14 +163,14 @@ export const AdminDashboard: React.FC = () => {
               <Dna className="w-6 h-6" />
             </div>
             <h3 className="text-base font-black text-stone-900 group-hover:text-orange-800 transition-colors">
-              Repository Forensic Chromatography
+              Repository Code Analysis
             </h3>
             <p className="text-xs text-stone-600 mt-1.5 leading-relaxed">
-              Inspect commit cadence, isolate git author anomalies, and verify zero AST reagent collision.
+              Inspect commit history, identify author contributions, and verify code integrity.
             </p>
           </div>
           <div className="mt-5 flex items-center gap-1.5 text-xs font-bold text-orange-800">
-            <span>Inspect Chromatography</span>
+            <span>Inspect Code</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </div>
         </Link>

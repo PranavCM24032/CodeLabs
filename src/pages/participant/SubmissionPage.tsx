@@ -387,12 +387,12 @@ export const SubmissionPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Automated Forensic Pre-Flight Scan */}
+      {/* Automated Pre-Flight Scan */}
       <div className="flex flex-col space-y-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5">
             <ShieldCheck className="w-4 h-4 text-secondary" />
-            <h2 className="font-bold text-sm text-on-surface">Forensic Pre-Flight Scan</h2>
+            <h2 className="font-bold text-sm text-on-surface">Pre-Flight Validation</h2>
           </div>
           <span className="px-2 py-0.5 rounded bg-secondary-container/30 text-secondary font-mono text-[10px] font-bold border border-secondary-container/40">
             5 / 5 READY

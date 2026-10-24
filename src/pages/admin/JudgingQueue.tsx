@@ -99,7 +99,7 @@ export const JudgingQueuePage: React.FC = () => {
     return (
       <div className="max-w-5xl mx-auto px-4 py-16 text-center text-stone-600">
         <div className="w-10 h-10 border-4 border-amber-500/20 border-t-emerald-600 rounded-full animate-spin mx-auto mb-3" />
-        <p className="text-xs font-semibold text-stone-700">Loading chemical evaluation queue and specimens...</p>
+        <p className="text-xs font-semibold text-stone-700">Loading evaluation queue...</p>
       </div>
     );
   }
@@ -112,7 +112,7 @@ export const JudgingQueuePage: React.FC = () => {
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse" />
             <span className="font-mono text-xs font-bold uppercase tracking-wider text-amber-900">
-              codeLab Analyst Queue
+              codeLab Judging Queue
             </span>
           </div>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-200/80 text-amber-950 font-mono text-[11px] font-bold border border-amber-300">

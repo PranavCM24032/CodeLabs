@@ -23,7 +23,7 @@ export const Navbar: React.FC = () => {
 
   return (
     <>
-      {/* Top Header Bar (Claymorphism Floating Capsule - Chemical Forensic Palette) */}
+      {/* Top Header Bar (Claymorphism Floating Capsule) */}
       <header className="fixed top-0 inset-x-0 z-50 pt-2 px-2.5 sm:px-6 pointer-events-none">
         <div className="h-14 sm:h-16 max-w-7xl mx-auto px-3 sm:px-5 bg-white/95 backdrop-blur-md border border-stone-200/90 rounded-2xl shadow-[6px_8px_20px_-4px_rgba(120,113,108,0.12),inset_1px_1px_2px_rgba(255,255,255,0.95)] flex items-center justify-between gap-2 sm:gap-3 pointer-events-auto">
           {/* Brand & Bauhaus Geometric Accent */}
@@ -64,12 +64,12 @@ export const Navbar: React.FC = () => {
             )}
             {role === 'admin' && (
               <span className="clay-pill px-2 py-0.5 bg-yellow-50 text-amber-900 text-[10px] font-bold uppercase hidden md:inline border border-yellow-300">
-                ANALYST
+                JUDGE
               </span>
             )}
             {role === 'participant' && user && (
               <span className="clay-pill px-2 py-0.5 bg-green-50 text-green-800 text-[10px] font-bold uppercase hidden md:inline border border-green-200">
-                SYNTHESIZER
+                PARTICIPANT
               </span>
             )}
           </div>
@@ -154,14 +154,14 @@ export const Navbar: React.FC = () => {
                 {notificationsOpen && (
                   <div className="absolute right-0 mt-2 w-72 sm:w-80 clay-card p-3 shadow-xl z-50 text-xs">
                     <div className="px-2 py-1.5 border-b border-stone-100 flex justify-between items-center">
-                      <span className="font-bold text-stone-900">Lab Dispatches</span>
+                      <span className="font-bold text-stone-900">Notifications</span>
                       <span className="text-[10px] text-stone-500 font-mono">
                         {unreadCount} unread
                       </span>
                     </div>
                     <div className="max-h-60 overflow-y-auto divide-y divide-stone-100 mt-1">
                       {notifications.length === 0 ? (
-                        <div className="px-4 py-3 text-stone-500 text-center">No lab notifications</div>
+                        <div className="px-4 py-3 text-stone-500 text-center">No notifications</div>
                       ) : (
                         notifications.map((n) => (
                           <div key={n.id} className="p-2.5 hover:bg-stone-50 rounded-xl transition-colors">
@@ -191,7 +191,7 @@ export const Navbar: React.FC = () => {
                     <div className="px-3 py-2 border-b border-stone-100">
                       <p className="font-bold text-stone-900 truncate">{profile?.displayName || user.email}</p>
                       <p className="text-[10px] text-green-700 font-mono font-semibold uppercase mt-0.5">
-                        Lab Role: {role}
+                        Role: {role}
                       </p>
                     </div>
 
@@ -202,7 +202,7 @@ export const Navbar: React.FC = () => {
                         className="flex items-center gap-2 px-3 py-2 text-stone-700 hover:bg-green-50 rounded-xl transition-colors min-h-[40px]"
                       >
                         <span className="material-symbols-outlined text-[16px] text-green-700">dashboard</span>
-                        Synthesis Portal
+                        Dashboard
                       </Link>
 
                       <Link
@@ -211,7 +211,7 @@ export const Navbar: React.FC = () => {
                         className="flex items-center gap-2 px-3 py-2 text-stone-700 hover:bg-yellow-50 rounded-xl transition-colors min-h-[40px]"
                       >
                         <span className="material-symbols-outlined text-[16px] text-amber-700">science</span>
-                        Forensic Queue
+                        Judging Queue
                       </Link>
 
                       <Link

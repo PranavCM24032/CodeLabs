@@ -81,7 +81,7 @@ export const LoginPage: React.FC = () => {
             codeLab Gateway
           </h1>
           <p className="text-xs text-stone-600 max-w-[320px] mt-1 text-center font-medium">
-            Forensic analysis, catalytic commit freeze, and chemical synthesis access.
+            Sign in to access your hackathon dashboard, teams, and submissions.
           </p>
         </div>
 

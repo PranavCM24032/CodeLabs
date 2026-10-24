@@ -280,7 +280,7 @@ export const ScoringAndLeaderboardPage: React.FC = () => {
                   1
                 </span>
                 <span className="text-on-surface font-medium">Cadence Integrity Score</span>
-                <span className="ml-auto font-mono text-[10px] text-on-surface-variant">Forensic AST Index</span>
+                <span className="ml-auto font-mono text-[10px] text-on-surface-variant">Code Quality Index</span>
               </div>
               <div className="flex items-center gap-2 bg-surface-container-high/60 px-2.5 py-1.5 rounded-lg">
                 <span className="w-4 h-4 rounded bg-primary/20 text-primary font-mono text-[10px] flex items-center justify-center font-bold">
@@ -390,7 +390,7 @@ export const ScoringAndLeaderboardPage: React.FC = () => {
           <div className="flex items-center justify-between p-2.5 rounded-xl bg-surface-container border border-outline-variant/20">
             <div>
               <span className="font-medium text-on-surface block">Show Criterion Sub-Scores</span>
-              <span className="text-[11px] text-on-surface-variant">Reveal breakdown: UI, Arch, Forensic & Pitch</span>
+              <span className="text-[11px] text-on-surface-variant">Reveal breakdown: UI, Arch, Code & Pitch</span>
             </div>
             <button
               type="button"
@@ -431,7 +431,7 @@ export const ScoringAndLeaderboardPage: React.FC = () => {
           {/* Row 4 */}
           <div className="flex items-center justify-between p-2.5 rounded-xl bg-surface-container border border-outline-variant/20">
             <div>
-              <span className="font-medium text-on-surface block">Display AST Forensics Verified Seal</span>
+              <span className="font-medium text-on-surface block">Display Integrity Verified Seal</span>
               <span className="text-[11px] text-on-surface-variant">Affix cryptographic commit badge on public cards</span>
             </div>
             <button

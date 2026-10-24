@@ -12,9 +12,9 @@ export const AccessDeniedPage: React.FC = () => {
         <div className="w-14 h-14 rounded-2xl bg-amber-200/80 border border-amber-300 flex items-center justify-center text-amber-800 mb-4 shadow-sm">
           <ShieldAlert className="w-7 h-7" />
         </div>
-        <h1 className="text-2xl font-black text-stone-900 tracking-tight">Reagent Clearance Required</h1>
+        <h1 className="text-2xl font-black text-stone-900 tracking-tight">Access Restricted</h1>
         <p className="mt-2 text-xs sm:text-sm text-stone-600 leading-relaxed">
-          Your current lab role (<span className="font-mono text-amber-800 font-bold uppercase">{role}</span>) does not have authorization to view this specimen or trigger this catalytic operation.
+          Your current role (<span className="font-mono text-amber-800 font-bold uppercase">{role}</span>) does not have authorization to view this page or perform this action.
         </p>
 
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3 w-full">
@@ -23,7 +23,7 @@ export const AccessDeniedPage: React.FC = () => {
             className="clay-btn-primary flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-bold"
           >
             <Home className="w-4 h-4" />
-            Lab Workbench
+            Dashboard
           </Link>
           <Link
             to="/"
@@ -45,7 +45,7 @@ export const AccountSuspendedPage: React.FC = () => {
         <div className="w-14 h-14 rounded-2xl bg-orange-200/80 border border-orange-300 flex items-center justify-center text-orange-800 mb-4 shadow-sm">
           <ShieldAlert className="w-7 h-7" />
         </div>
-        <h1 className="text-2xl font-black text-stone-900 tracking-tight">Specimen Clearance Suspended</h1>
+        <h1 className="text-2xl font-black text-stone-900 tracking-tight">Account Suspended</h1>
         <p className="mt-2 text-xs sm:text-sm text-stone-600 leading-relaxed">
           This account has been administratively sealed. Contact the codeLab Director at <span className="font-mono text-orange-900 font-bold">pranavpaunikar.ml24@sbjit.edu.in</span> for clearance review.
         </p>

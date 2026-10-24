@@ -22,8 +22,8 @@ export const RegisterPage: React.FC = () => {
   const [name, setName] = useState('Aarav Sharma');
   const [email, setEmail] = useState('aarav.s@campus.edu');
   const [githubHandle, setGithubHandle] = useState('@aarav-dev');
-  const [password, setPassword] = useState('Forensic#Secure2025!');
-  const [confirmPassword, setConfirmPassword] = useState('Forensic#Secure2025!');
+  const [password, setPassword] = useState('SecurePass2025!');
+  const [confirmPassword, setConfirmPassword] = useState('SecurePass2025!');
   const [showPass, setShowPass] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(true);
   const [error, setError] = useState('');
@@ -229,7 +229,7 @@ export const RegisterPage: React.FC = () => {
                 />
                 <span className="text-[11px] text-on-surface-variant leading-relaxed">
                   I agree to the <strong className="text-primary">GitTrack Code of Conduct</strong>,{' '}
-                  <strong className="text-on-surface">Anti-Plagiarism Directive</strong>, and commit forensics verification terms for all automated evaluation pipelines.
+                  <strong className="text-on-surface">Anti-Plagiarism Directive</strong>, and the terms for automated code evaluation pipelines.
                 </span>
               </label>
             </div>

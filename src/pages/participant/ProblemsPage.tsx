@@ -77,7 +77,7 @@ export const ProblemsPage: React.FC = () => {
     if (problem.currentCount >= problem.maxCapacity) {
       setActionMessage({
         type: 'error',
-        text: 'This chemical research track has reached maximum squad capacity.',
+        text: 'This challenge track has reached maximum team capacity.',
       });
       return;
     }

@@ -41,7 +41,7 @@ export const PublicLeaderboardPage: React.FC = () => {
         window.URL.revokeObjectURL(url);
       } else {
         const rows = [
-          ['Rank', 'Specimen Team', 'Problem Track', 'Forensic Score', 'Status'],
+          ['Rank', 'Team', 'Problem Track', 'Score', 'Status'],
           ...(leaderboard?.standings || []).map((s: LeaderboardEntry) => [
             s.rank,
             s.teamName,

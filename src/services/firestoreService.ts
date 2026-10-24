@@ -162,7 +162,7 @@ export async function saveSubmission(eventId: string, submission: Submission): P
   }
 }
 
-// ==================== FORENSICS & FINDINGS ====================
+// ==================== ANALYSIS & FINDINGS ====================
 
 export async function getAnalysisJobsForEvent(eventId: string): Promise<AnalysisJob[]> {
   const path = `events/${eventId}/analysisJobs`;

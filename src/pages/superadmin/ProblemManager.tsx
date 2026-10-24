@@ -59,7 +59,7 @@ export const ProblemManagerPage: React.FC = () => {
     setEditingId(null);
     setTitle('');
     setCode(`TRK-${Math.floor(10 + Math.random() * 90)}`);
-    setTrack('Chemical Forensics & AST');
+    setTrack('Web & Cloud Engineering');
     setSummary('');
     setDescription('');
     setDifficulty('intermediate');
@@ -143,13 +143,13 @@ export const ProblemManagerPage: React.FC = () => {
           <div>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-300 font-mono text-[11px] font-bold mb-2 shadow-xs">
               <FlaskConical className="w-3.5 h-3.5 text-amber-700" />
-              <span>codeLab Reagent Tracks</span>
+              <span>codeLab Challenge Tracks</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-stone-900 tracking-tight">
-              Chemical Challenge Tracks
+              Challenge Tracks
             </h1>
             <p className="text-xs sm:text-sm text-stone-600 mt-1">
-              Configure track categories, squad limits, and specimen scopes for {activeEvent?.title || 'active event'}.
+              Configure track categories, squad limits, and problem scopes for {activeEvent?.title || 'active event'}.
             </p>
           </div>
 
@@ -251,7 +251,7 @@ export const ProblemManagerPage: React.FC = () => {
                   required
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="e.g. Chemical AST Plagiarism Synthesizer"
+                  placeholder="e.g. Distributed Systems Architecture"
                   className="clay-input"
                 />
               </div>

@@ -105,10 +105,10 @@ export const ParticipantDashboard: React.FC = () => {
         <div className="mt-5 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
             <h1 className="text-2xl sm:text-3xl font-black text-stone-900 tracking-tight">
-              Chemical Code Forensics Laboratory
+              Hackathon Participant Dashboard
             </h1>
             <p className="text-xs sm:text-sm text-stone-700 mt-1 max-w-xl leading-relaxed">
-              Track your squad's specimen commit cadence, lock immutable git SHAs before catalytic freeze, and view multi-reagent scoring status.
+              Track your team's progress, submit your project before the deadline, and view scoring status.
             </p>
           </div>
 
@@ -118,7 +118,7 @@ export const ParticipantDashboard: React.FC = () => {
               className="clay-btn-orange py-3 px-5 rounded-2xl text-xs font-black flex items-center gap-2 shadow-md"
             >
               <Rocket className="w-4 h-4" />
-              <span>{submission ? 'View Sealed Specimen' : 'Freeze & Submit SHA'}</span>
+              <span>{submission ? 'View Submission' : 'Submit Project'}</span>
             </Link>
           </div>
         </div>
@@ -182,7 +182,7 @@ export const ParticipantDashboard: React.FC = () => {
           </div>
           <div className="mt-2">
             <div className="font-black text-base text-orange-950 truncate">
-              {submission?.frozenCommitSha ? 'Specimen Sealed' : 'Draft Intake'}
+              {submission?.frozenCommitSha ? 'Submitted' : 'Draft'}
             </div>
             <div className="font-mono text-xs text-orange-800 mt-0.5 font-semibold">
               {submission?.frozenCommitSha ? 'SHA locked for review' : 'Ready to freeze'}
@@ -222,9 +222,9 @@ export const ParticipantDashboard: React.FC = () => {
               <FlaskConical className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-black text-stone-900 text-sm">Select Your Chemical Research Track</h3>
+              <h3 className="font-black text-stone-900 text-sm">Select Your Challenge Track</h3>
               <p className="text-xs text-stone-600 mt-0.5">
-                Review available challenge statements and lock a track for your specimen squad.
+                Review available challenge statements and lock a track for your team.
               </p>
             </div>
           </div>
@@ -365,23 +365,23 @@ export const ParticipantDashboard: React.FC = () => {
         )}
       </section>
 
-      {/* 6. Four-Stage Chemical Synthesis Timeline */}
+      {/* 6. Four-Stage Hackathon Timeline */}
       <section className="clay-card-yellow p-6 space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <FlaskConical className="w-5 h-5 text-amber-800" />
             <h3 className="font-black text-sm sm:text-base text-stone-900">
-              codeLab Synthesis Pipeline
+              codeLab Evaluation Pipeline
             </h3>
           </div>
-          <span className="font-mono text-[11px] font-bold text-amber-900">4-Stage Assay</span>
+          <span className="font-mono text-[11px] font-bold text-amber-900">4-Stage Process</span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
           <div className="p-3.5 rounded-2xl bg-white/70 border border-amber-200/80 flex flex-col justify-between">
             <div>
               <span className="font-mono text-[10px] font-black text-amber-800">STAGE 01</span>
-              <h4 className="font-bold text-xs text-stone-900 mt-0.5">Specimen Intake</h4>
+              <h4 className="font-bold text-xs text-stone-900 mt-0.5">Project Submission</h4>
               <p className="text-[11px] text-stone-600 mt-1">Form squad, enroll in challenge track, and link git conduit.</p>
             </div>
             <div className="mt-3">
@@ -394,7 +394,7 @@ export const ParticipantDashboard: React.FC = () => {
           <div className="p-3.5 rounded-2xl bg-white/70 border border-amber-200/80 flex flex-col justify-between">
             <div>
               <span className="font-mono text-[10px] font-black text-amber-800">STAGE 02</span>
-              <h4 className="font-bold text-xs text-stone-900 mt-0.5">Catalytic Freeze</h4>
+              <h4 className="font-bold text-xs text-stone-900 mt-0.5">Deadline Freeze</h4>
               <p className="text-[11px] text-stone-600 mt-1">Lock immutable commit SHA to halt further specimen alterations.</p>
             </div>
             <div className="mt-3">
@@ -407,8 +407,8 @@ export const ParticipantDashboard: React.FC = () => {
           <div className="p-3.5 rounded-2xl bg-white/70 border border-amber-200/80 flex flex-col justify-between">
             <div>
               <span className="font-mono text-[10px] font-black text-amber-800">STAGE 03</span>
-              <h4 className="font-bold text-xs text-stone-900 mt-0.5">Reagent Evaluation</h4>
-              <p className="text-[11px] text-stone-600 mt-1">Forensic analysts inspect chromatography and apply rubric assays.</p>
+              <h4 className="font-bold text-xs text-stone-900 mt-0.5">Judging & Evaluation</h4>
+              <p className="text-[11px] text-stone-600 mt-1">Judges review submissions and apply rubric scores.</p>
             </div>
             <div className="mt-3">
               <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200">

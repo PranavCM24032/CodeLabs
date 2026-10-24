@@ -75,10 +75,10 @@ export const SuperadminDashboard: React.FC = () => {
         <div className="mt-5 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
             <h1 className="text-2xl sm:text-3xl font-black text-stone-900 tracking-tight">
-              Chemical Synthesis & Governance Console
+              Platform & Governance Console
             </h1>
             <p className="text-xs sm:text-sm text-stone-700 mt-1 max-w-xl leading-relaxed">
-              Real-time oversight of hackathon specimen intake, forensic chromatography pipelines, catalytic rubrics, and published leaderboards.
+              Real-time oversight of hackathon events, team submissions, judging rubrics, and published leaderboards.
             </p>
           </div>
 
@@ -108,8 +108,8 @@ export const SuperadminDashboard: React.FC = () => {
             {users.length}
           </div>
           <div className="flex items-center justify-between font-mono text-[10px] text-stone-600 pt-2 border-t border-stone-200 mt-2 font-semibold">
-            <span>{participantCount} Synthesizers</span>
-            <span>{analystCount} Analysts</span>
+            <span>{participantCount} Participants</span>
+            <span>{analystCount} Judges</span>
             <span>{directorCount} Root</span>
           </div>
         </div>
@@ -133,7 +133,7 @@ export const SuperadminDashboard: React.FC = () => {
         {/* KPI 3: Audit Ledger Entries */}
         <div className="clay-card-orange p-5">
           <div className="flex justify-between items-center text-xs font-bold text-orange-900 mb-1">
-            <span>Forensic Audit Ledger</span>
+            <span>Audit Ledger</span>
             <span className="p-2 rounded-xl bg-orange-200 text-orange-900 border border-orange-300">
               <Activity className="w-4 h-4" />
             </span>
@@ -229,12 +229,12 @@ export const SuperadminDashboard: React.FC = () => {
         </Link>
       </div>
 
-      {/* Recent Forensic Activity Log */}
+      {/* Recent Activity Log */}
       <div className="clay-card overflow-hidden">
         <div className="p-5 border-b border-stone-200/80 flex justify-between items-center bg-stone-50/60">
           <div className="flex items-center gap-2">
             <Activity className="w-4 h-4 text-amber-700" />
-            <h3 className="font-black text-stone-900 text-sm">Recent Forensic Audit Activity</h3>
+            <h3 className="font-black text-stone-900 text-sm">Recent Audit Activity</h3>
           </div>
           <span className="text-xs font-mono font-bold text-stone-500">{auditLogs.length} logged actions</span>
         </div>

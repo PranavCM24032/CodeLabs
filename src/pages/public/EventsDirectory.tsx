@@ -19,9 +19,9 @@ export const EventsDirectory: React.FC = () => {
         setEvents([
           {
             id: 'event-hackgrid-2025',
-            title: 'InterCollege HackGrid 2025: Distributed Chemical Synthesis',
+            title: 'InterCollege HackGrid 2025: Distributed Systems Challenge',
             description:
-              'State-wide engineering championship challenging teams to build high-concurrency distributed systems with automated commit forensics.',
+              'State-wide engineering championship challenging teams to build high-concurrency distributed systems with automated code quality checks.',
             slug: 'hackgrid-2025',
             submissionDeadline: new Date(Date.now() + 86400000 * 2).toISOString(),
             createdBy: 'admin',
@@ -31,7 +31,7 @@ export const EventsDirectory: React.FC = () => {
             minTeamSize: 2,
             maxTeamSize: 4,
             rounds: [
-              { id: 'r1', order: 1, name: 'Round 1: Technical Audit & Forensics', maxMarks: 100, weight: 50 },
+              { id: 'r1', order: 1, name: 'Round 1: Technical Audit & Review', maxMarks: 100, weight: 50 },
               { id: 'r2', order: 2, name: 'Round 2: Live Pitch & Architecture', maxMarks: 100, weight: 50 },
             ],
             createdAt: new Date().toISOString(),
@@ -58,7 +58,7 @@ export const EventsDirectory: React.FC = () => {
           },
           {
             id: 'event-cybershield-2025',
-            title: 'CyberShield Chemical Code Forensics',
+            title: 'CyberShield Code Security Challenge',
             slug: 'cybershield-2025',
             submissionDeadline: new Date(Date.now() + 86400000).toISOString(),
             createdBy: 'admin',
@@ -114,7 +114,7 @@ export const EventsDirectory: React.FC = () => {
             <div className="flex items-center gap-2">
               <div className="w-3.5 h-3.5 rounded-full bg-amber-500 border border-stone-900" />
               <span className="font-mono text-xs font-black uppercase tracking-widest text-stone-900">
-                BAUHAUS // LABORATORY ASSAYS
+                BAUHAUS // EVENTS REGISTRY
               </span>
             </div>
             <span className="font-mono text-xs font-black px-2.5 py-1 bg-white border-2 border-stone-900 rounded-full text-stone-900">
@@ -127,7 +127,7 @@ export const EventsDirectory: React.FC = () => {
               Hackathon Research Directory
             </h1>
             <p className="text-xs sm:text-sm text-stone-700 font-medium font-mono mt-1">
-              Explore scheduled chemical synthesis events, challenge tracks, and evaluation criteria.
+              Explore scheduled hackathon events, challenge tracks, and evaluation criteria.
             </p>
           </div>
         </section>

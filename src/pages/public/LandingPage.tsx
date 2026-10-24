@@ -117,12 +117,12 @@ export const LandingPage: React.FC = () => {
             {/* Stark Typographic Headline */}
             <div className="space-y-3">
               <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-stone-900 tracking-tight leading-[1.08] uppercase">
-                Chemical code <br />
-                <span className="text-emerald-700 underline decoration-amber-400 decoration-wavy decoration-2">forensics</span> &amp; <br />
-                synthesis.
+                Build, <br />
+                <span className="text-emerald-700 underline decoration-amber-400 decoration-wavy decoration-2">compete</span> &amp; <br />
+                win.
               </h1>
               <p className="text-sm sm:text-base text-stone-700 leading-relaxed max-w-xl font-medium">
-                codeLab deconstructs hackathon evaluations into pure geometric function: immutable commit snapshots, catalytic deadline freezes, and multi-reagent rubric scoring.
+                codeLab streamlines hackathon evaluations: immutable commit snapshots, automated deadline freezes, and multi-criteria rubric scoring.
               </p>
             </div>
 
@@ -133,14 +133,14 @@ export const LandingPage: React.FC = () => {
                 className="clay-btn-primary min-h-[48px] px-6 py-3 text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 border-2 border-stone-900"
               >
                 <Square className="w-4 h-4 fill-white text-white" />
-                <span>Explore Assays</span>
+                <span>Explore Events</span>
               </Link>
               <Link
                 to="/leaderboard"
                 className="clay-card-yellow min-h-[48px] px-6 py-3 text-xs font-black uppercase tracking-wider text-stone-900 flex items-center justify-center gap-2 border-2 border-stone-900 hover:-translate-y-1 transition-transform"
               >
                 <Circle className="w-4 h-4 fill-amber-500 text-amber-600" />
-                <span>Synthesis Standings</span>
+                <span>View Leaderboard</span>
               </Link>
             </div>
 
@@ -152,7 +152,7 @@ export const LandingPage: React.FC = () => {
               <div className="flex items-center justify-between">
                 <span className="text-xs font-black font-mono uppercase tracking-wider text-stone-900 flex items-center gap-2">
                   <span className="w-2.5 h-2.5 bg-emerald-600 border border-stone-900" />
-                  Active Syntheses in Pipeline
+                  Active Hackathons
                 </span>
                 <span className="text-[11px] font-mono text-stone-500 font-bold">REAL FIRESTORE DATA</span>
               </div>
@@ -275,7 +275,7 @@ export const LandingPage: React.FC = () => {
                       className="clay-btn-primary min-h-[44px] py-2.5 px-4 text-xs font-black uppercase tracking-wider text-center flex items-center justify-center gap-2 border-2 border-stone-900"
                     >
                       <span>
-                        Enter {role === 'superadmin' ? 'Director Console' : role === 'admin' ? 'Judging Queue' : 'Synthesis Portal'}
+                        Enter {role === 'superadmin' ? 'Admin Console' : role === 'admin' ? 'Judging Queue' : 'Dashboard'}
                       </span>
                       <ArrowRight className="w-4 h-4" />
                     </Link>
@@ -283,7 +283,7 @@ export const LandingPage: React.FC = () => {
                       onClick={() => logout()}
                       className="text-xs text-stone-600 hover:text-stone-900 py-1.5 text-center font-bold font-mono transition-colors min-h-[44px] flex items-center justify-center"
                     >
-                      Sign out / Change specimen identity
+                      Sign out / Switch account
                     </button>
                   </div>
                 </div>
@@ -337,7 +337,7 @@ export const LandingPage: React.FC = () => {
                       <form onSubmit={handleEmailSubmit} className="mt-3 flex flex-col gap-3">
                         <div>
                           <label className="text-[11px] font-black text-stone-800 block mb-1 uppercase font-mono">
-                            Academic Lab Email
+                            Academic Email
                           </label>
                           <div className="relative">
                             <Mail className="w-4 h-4 absolute left-3 top-3 text-stone-500" />
@@ -354,7 +354,7 @@ export const LandingPage: React.FC = () => {
 
                         <div>
                           <label className="text-[11px] font-black text-stone-800 block mb-1 uppercase font-mono">
-                            Reagent Passkey
+                            Password
                           </label>
                           <div className="relative">
                             <Key className="w-4 h-4 absolute left-3 top-3 text-stone-500" />
@@ -382,7 +382,7 @@ export const LandingPage: React.FC = () => {
                           disabled={authLoading}
                           className="clay-btn-orange min-h-[44px] py-2.5 px-4 text-xs font-black uppercase tracking-wider text-center border-2 border-stone-900 mt-1"
                         >
-                          {authLoading ? 'Synthesizing...' : 'Sign In with Email'}
+                          {authLoading ? 'Signing in...' : 'Sign In with Email'}
                         </button>
                       </form>
                     )}
@@ -394,7 +394,7 @@ export const LandingPage: React.FC = () => {
               <div className="mt-4 pt-3 border-t-2 border-stone-200 flex items-center justify-between text-[11px] text-stone-500 font-mono font-bold">
                 <span className="flex items-center gap-1.5">
                   <Shield className="w-3.5 h-3.5 text-emerald-700" />
-                  <span>Chemical Forensic Sandbox</span>
+                  <span>Secure Platform</span>
                 </span>
                 <span className="text-emerald-800">ENCRYPTED</span>
               </div>
@@ -410,11 +410,11 @@ export const LandingPage: React.FC = () => {
                 GEOMETRIC ARCHITECTURE
               </span>
               <h2 className="text-2xl sm:text-3xl font-black text-stone-900 tracking-tight uppercase">
-                The 3-Stage Forensic Pipeline
+                The 3-Stage Evaluation Pipeline
               </h2>
             </div>
             <p className="text-xs sm:text-sm text-stone-600 font-mono font-semibold max-w-sm">
-              Form follows function: specimen intake, catalytic freeze, and multi-reagent scoring.
+              Form follows function: project submission, deadline freeze, and multi-criteria scoring.
             </p>
           </div>
 
@@ -432,10 +432,10 @@ export const LandingPage: React.FC = () => {
                   </span>
                 </div>
                 <h3 className="font-black text-stone-900 text-base uppercase font-mono">
-                  Specimen Intake
+                  Project Submission
                 </h3>
                 <p className="text-xs text-stone-700 leading-relaxed font-medium mt-1">
-                  Connect Git repository conduits. Commit history and author distributions are parsed into chromatography logs without manual tampering.
+                  Connect your Git repository. Commit history and author contributions are recorded automatically without manual intervention.
                 </p>
               </div>
 
@@ -458,10 +458,10 @@ export const LandingPage: React.FC = () => {
                   </span>
                 </div>
                 <h3 className="font-black text-stone-900 text-base uppercase font-mono">
-                  Catalytic Freeze
+                  Deadline Freeze
                 </h3>
                 <p className="text-xs text-stone-700 leading-relaxed font-medium mt-1">
-                  At the deadline threshold, commit HEAD SHAs are permanently sealed. Unverified post-deadline code commits are systematically isolated.
+                  At the deadline, commit HEAD SHAs are permanently sealed. Post-deadline code changes are automatically blocked.
                 </p>
               </div>
 
@@ -484,10 +484,10 @@ export const LandingPage: React.FC = () => {
                   </span>
                 </div>
                 <h3 className="font-black text-stone-900 text-base uppercase font-mono">
-                  Reagent Synthesis
+                  Judging & Results
                 </h3>
                 <p className="text-xs text-stone-700 leading-relaxed font-medium mt-1">
-                  Multi-reagent rubric assays are evaluated by authorized analysts with normalized score distributions and verified leaderboard release.
+                  Multi-criteria rubrics are evaluated by authorized judges with normalized score distributions and verified leaderboard release.
                 </p>
               </div>
 
@@ -514,9 +514,9 @@ export const LandingPage: React.FC = () => {
             <span className="font-bold text-stone-600">Bauhaus Claymorphism Edition</span>
           </div>
           <div className="flex items-center gap-6 font-mono font-bold uppercase text-[11px]">
-            <Link to="/events" className="hover:text-emerald-700 transition-colors">Assays</Link>
-            <Link to="/leaderboard" className="hover:text-emerald-700 transition-colors">Standings</Link>
-            <Link to="/login" className="hover:text-emerald-700 transition-colors">Gateway</Link>
+            <Link to="/events" className="hover:text-emerald-700 transition-colors">Events</Link>
+            <Link to="/leaderboard" className="hover:text-emerald-700 transition-colors">Leaderboard</Link>
+            <Link to="/login" className="hover:text-emerald-700 transition-colors">Login</Link>
           </div>
         </div>
       </footer>
