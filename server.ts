@@ -288,3 +288,12 @@ app.all('/api/export/leaderboard-csv', (req: Request, res: Response) => {
 
 export default app;
 
+
+// Serve static in production (Vercel)
+const distPath = path.resolve(__dirname, 'dist');
+app.use(express.static(distPath));
+app.get('*', (_req, res) => {
+  res.sendFile(path.resolve(distPath, 'index.html'));
+});
+export default app;
+
