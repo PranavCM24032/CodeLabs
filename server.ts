@@ -161,3 +161,107 @@ if (!process.env.VERCEL) {
 
 export default app;
 
+
+// JSON-based user access control
+const DATA_DIR = path.resolve(__dirname, 'data');
+const STAFF_USERS_PATH = path.join(DATA_DIR, 'staff-users.json');
+const PARTICIPANTS_PATH = path.join(DATA_DIR, 'participants.json');
+
+function readJsonFile(filePath: string) {
+  try {
+    if (fs.existsSync(filePath)) {
+      const content = fs.readFileSync(filePath, 'utf8');
+      return JSON.parse(content);
+    }
+  } catch (e) {
+    console.error('Error reading JSON file:', e);
+  }
+  return [];
+}
+
+app.get('/api/auth/allowed-users', (req: Request, res: Response) => {
+  try {
+    const staffUsers = readJsonFile(STAFF_USERS_PATH);
+    const participants = readJsonFile(PARTICIPANTS_PATH);
+    res.json({ staffUsers, participants });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/auth/check-access', (req: Request, res: Response) => {
+  try {
+    const email = (req.query.email as string || '').toLowerCase();
+    if (!email) return res.status(400).json({ allowed: false, error: 'Email required' });
+    
+    const staffUsers = readJsonFile(STAFF_USERS_PATH);
+    const participants = readJsonFile(PARTICIPANTS_PATH);
+    
+    const staffUser = staffUsers.find((u: any) => (u.email || '').toLowerCase() === email);
+    if (staffUser) {
+      return res.json({ allowed: true, type: 'staff', user: staffUser });
+    }
+    
+    const participant = participants.find((p: any) => (p.email || '').toLowerCase() === email);
+    if (participant) {
+      return res.json({ allowed: true, type: 'participant', user: participant });
+    }
+    
+    res.json({ allowed: false });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+// JSON-based user access control
+const DATA_DIR = path.resolve(__dirname, 'data');
+const STAFF_USERS_PATH = path.join(DATA_DIR, 'staff-users.json');
+const PARTICIPANTS_PATH = path.join(DATA_DIR, 'participants.json');
+
+function readJsonFile(filePath: string) {
+  try {
+    if (fs.existsSync(filePath)) {
+      const content = fs.readFileSync(filePath, 'utf8');
+      return JSON.parse(content);
+    }
+  } catch (e) {
+    console.error('Error reading JSON file:', e);
+  }
+  return [];
+}
+
+app.get('/api/auth/allowed-users', (req: Request, res: Response) => {
+  try {
+    const staffUsers = readJsonFile(STAFF_USERS_PATH);
+    const participants = readJsonFile(PARTICIPANTS_PATH);
+    res.json({ staffUsers, participants });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/auth/check-access', (req: Request, res: Response) => {
+  try {
+    const email = ((req.query.email as string) || '').toLowerCase();
+    if (!email) return res.status(400).json({ allowed: false, error: 'Email required' });
+    
+    const staffUsers = readJsonFile(STAFF_USERS_PATH);
+    const participants = readJsonFile(PARTICIPANTS_PATH);
+    
+    const staffUser = staffUsers.find((u: any) => (u.email || '').toLowerCase() === email);
+    if (staffUser) {
+      return res.json({ allowed: true, type: 'staff', user: staffUser });
+    }
+    
+    const participant = participants.find((p: any) => (p.email || '').toLowerCase() === email);
+    if (participant) {
+      return res.json({ allowed: true, type: 'participant', user: participant });
+    }
+    
+    res.json({ allowed: false });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
