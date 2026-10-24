@@ -14,9 +14,10 @@ export interface AllowedUsers {
   participants: ParticipantEntry[];
 }
 
+const API_BASE = `http://localhost:${process.env.PORT || 3000}`;
 export async function fetchAllowedUsers(): Promise<AllowedUsers> {
   try {
-    const res = await fetch('/api/auth/allowed-users');
+    const res = await fetch(`${API_BASE}/api/auth/allowed-users`);
     if (res.ok) {
       const data = await res.json();
       return data;
@@ -29,7 +30,7 @@ export async function fetchAllowedUsers(): Promise<AllowedUsers> {
 
 export async function checkAccess(email: string): Promise<{ allowed: boolean; type?: 'staff' | 'participant'; user?: any }> {
   try {
-    const res = await fetch('/api/auth/check-access?email=' + encodeURIComponent(email));
+    const res = await fetch(`${API_BASE}/api/auth/check-access?email=` + encodeURIComponent(email));
     if (res.ok) {
       return await res.json();
     }
@@ -38,3 +39,6 @@ export async function checkAccess(email: string): Promise<{ allowed: boolean; ty
   }
   return { allowed: false };
 }
+
+
+
