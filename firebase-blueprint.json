@@ -1,0 +1,295 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile document",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "format": "email", "maxLength": 256 },
+        "displayName": { "type": "string", "maxLength": 100 },
+        "photoURL": { "type": "string", "maxLength": 1024 },
+        "role": { "type": "string", "enum": ["participant", "admin", "superadmin"] },
+        "status": { "type": "string", "enum": ["active", "suspended"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "displayName", "role", "status"]
+    },
+    "AdminRef": {
+      "title": "AdminRef",
+      "description": "Marker document for admin authorization fast checks",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "format": "email" },
+        "role": { "type": "string", "enum": ["admin", "superadmin"] },
+        "grantedAt": { "type": "string", "format": "date-time" },
+        "grantedBy": { "type": "string", "maxLength": 128 }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "Event": {
+      "title": "Event",
+      "description": "Hackathon event configuration and lifecycle",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 200 },
+        "slug": { "type": "string", "maxLength": 200 },
+        "description": { "type": "string", "maxLength": 5000 },
+        "startDate": { "type": "string", "format": "date-time" },
+        "endDate": { "type": "string", "format": "date-time" },
+        "submissionDeadline": { "type": "string", "format": "date-time" },
+        "minTeamSize": { "type": "number" },
+        "maxTeamSize": { "type": "number" },
+        "status": { "type": "string", "enum": ["draft", "published", "active", "judging", "completed", "archived"] },
+        "createdBy": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "title", "status", "minTeamSize", "maxTeamSize"]
+    },
+    "EventAssignment": {
+      "title": "EventAssignment",
+      "description": "Admin delegation to an event",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "eventId": { "type": "string", "maxLength": 128 },
+        "adminId": { "type": "string", "maxLength": 128 },
+        "adminEmail": { "type": "string", "maxLength": 256 },
+        "assignedRounds": { "type": "string" },
+        "canPublishLeaderboard": { "type": "boolean" },
+        "canManageTeams": { "type": "boolean" },
+        "assignedAt": { "type": "string", "format": "date-time" },
+        "assignedBy": { "type": "string", "maxLength": 128 }
+      },
+      "required": ["id", "eventId", "adminId"]
+    },
+    "Team": {
+      "title": "Team",
+      "description": "Participant team registered for an event",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "eventId": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 100 },
+        "code": { "type": "string", "maxLength": 20 },
+        "leaderId": { "type": "string", "maxLength": 128 },
+        "leaderEmail": { "type": "string", "maxLength": 256 },
+        "members": { "type": "string" },
+        "problemId": { "type": "string", "maxLength": 128 },
+        "submissionStatus": { "type": "string", "enum": ["not_submitted", "submitted", "under_review", "evaluated"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "eventId", "name", "leaderId"]
+    },
+    "ProblemStatement": {
+      "title": "ProblemStatement",
+      "description": "Hackathon track or challenge description",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "eventId": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 200 },
+        "code": { "type": "string", "maxLength": 50 },
+        "track": { "type": "string", "maxLength": 100 },
+        "summary": { "type": "string", "maxLength": 1000 },
+        "description": { "type": "string", "maxLength": 10000 },
+        "difficulty": { "type": "string", "enum": ["beginner", "intermediate", "advanced", "open"] },
+        "maxCapacity": { "type": "number" },
+        "currentCount": { "type": "number" },
+        "status": { "type": "string", "enum": ["draft", "published", "archived"] }
+      },
+      "required": ["id", "eventId", "title", "code", "status"]
+    },
+    "Submission": {
+      "title": "Submission",
+      "description": "Team repository submission with frozen commit SHA snapshot",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "teamId": { "type": "string", "maxLength": 128 },
+        "eventId": { "type": "string", "maxLength": 128 },
+        "problemId": { "type": "string", "maxLength": 128 },
+        "provider": { "type": "string", "enum": ["github", "gitlab", "bitbucket"] },
+        "repoUrl": { "type": "string", "maxLength": 512 },
+        "branch": { "type": "string", "maxLength": 100 },
+        "frozenCommitSha": { "type": "string", "maxLength": 64 },
+        "commitMessage": { "type": "string", "maxLength": 500 },
+        "authorName": { "type": "string", "maxLength": 100 },
+        "committedAt": { "type": "string", "format": "date-time" },
+        "snapshotAt": { "type": "string", "format": "date-time" },
+        "status": { "type": "string", "enum": ["submitted", "analyzing", "analyzed", "flagged", "cleared"] },
+        "submittedBy": { "type": "string", "maxLength": 128 }
+      },
+      "required": ["id", "teamId", "eventId", "provider", "repoUrl", "frozenCommitSha", "status"]
+    },
+    "AnalysisJob": {
+      "title": "AnalysisJob",
+      "description": "Repository forensics and code similarity analysis job",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "submissionId": { "type": "string", "maxLength": 128 },
+        "eventId": { "type": "string", "maxLength": 128 },
+        "teamId": { "type": "string", "maxLength": 128 },
+        "status": { "type": "string", "enum": ["queued", "running", "completed", "failed"] },
+        "similarityScore": { "type": "number" },
+        "lateBulkUploadIndicator": { "type": "boolean" },
+        "bulkUploadReason": { "type": "string", "maxLength": 500 },
+        "totalCommits": { "type": "number" },
+        "activeContributors": { "type": "number" },
+        "findingsCount": { "type": "number" },
+        "analyzedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "submissionId", "eventId", "status"]
+    },
+    "EvaluationSchema": {
+      "title": "EvaluationSchema",
+      "description": "Dynamic evaluation rubric definition with versioning",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "eventId": { "type": "string", "maxLength": 128 },
+        "roundId": { "type": "string", "maxLength": 50 },
+        "name": { "type": "string", "maxLength": 150 },
+        "version": { "type": "number" },
+        "status": { "type": "string", "enum": ["draft", "published", "retired"] },
+        "totalMaxMarks": { "type": "number" },
+        "criteria": { "type": "string" },
+        "createdBy": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "eventId", "name", "version", "status", "totalMaxMarks"]
+    },
+    "Evaluation": {
+      "title": "Evaluation",
+      "description": "Judge scoring record for team submission",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "eventId": { "type": "string", "maxLength": 128 },
+        "roundId": { "type": "string", "maxLength": 50 },
+        "teamId": { "type": "string", "maxLength": 128 },
+        "submissionId": { "type": "string", "maxLength": 128 },
+        "judgeId": { "type": "string", "maxLength": 128 },
+        "judgeEmail": { "type": "string", "maxLength": 256 },
+        "schemaId": { "type": "string", "maxLength": 128 },
+        "schemaVersion": { "type": "number" },
+        "scores": { "type": "string" },
+        "totalScore": { "type": "number" },
+        "generalFeedback": { "type": "string", "maxLength": 3000 },
+        "internalNotes": { "type": "string", "maxLength": 3000 },
+        "status": { "type": "string", "enum": ["draft", "submitted", "returned", "approved", "finalized"] },
+        "submittedAt": { "type": "string", "format": "date-time" },
+        "overrideReason": { "type": "string", "maxLength": 1000 }
+      },
+      "required": ["id", "eventId", "teamId", "judgeId", "schemaId", "status"]
+    },
+    "Leaderboard": {
+      "title": "Leaderboard",
+      "description": "Published official leaderboard standings",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "eventId": { "type": "string", "maxLength": 128 },
+        "status": { "type": "string", "enum": ["draft", "published"] },
+        "standings": { "type": "string" },
+        "publishedAt": { "type": "string", "format": "date-time" },
+        "publishedBy": { "type": "string", "maxLength": 128 },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "eventId", "status"]
+    },
+    "AuditLog": {
+      "title": "AuditLog",
+      "description": "Immutable security and governance action log",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "actorId": { "type": "string", "maxLength": 128 },
+        "actorEmail": { "type": "string", "maxLength": 256 },
+        "action": { "type": "string", "maxLength": 100 },
+        "entityType": { "type": "string", "maxLength": 50 },
+        "entityId": { "type": "string", "maxLength": 128 },
+        "eventId": { "type": "string", "maxLength": 128 },
+        "details": { "type": "string", "maxLength": 4000 },
+        "reason": { "type": "string", "maxLength": 1000 },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "actorId", "action", "timestamp"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "User in-app notifications",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 150 },
+        "message": { "type": "string", "maxLength": 1000 },
+        "type": { "type": "string", "enum": ["info", "success", "warning", "action"] },
+        "read": { "type": "boolean" },
+        "link": { "type": "string", "maxLength": 256 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "title", "message", "read"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles"
+    },
+    "/admins/{userId}": {
+      "schema": "AdminRef",
+      "description": "Admin and Superadmin role index for instant rule lookups"
+    },
+    "/events/{eventId}": {
+      "schema": "Event",
+      "description": "Hackathon events"
+    },
+    "/events/{eventId}/assignments/{assignmentId}": {
+      "schema": "EventAssignment",
+      "description": "Admin delegations for events"
+    },
+    "/events/{eventId}/teams/{teamId}": {
+      "schema": "Team",
+      "description": "Participant teams registered under an event"
+    },
+    "/events/{eventId}/problems/{problemId}": {
+      "schema": "ProblemStatement",
+      "description": "Problem statements under an event"
+    },
+    "/events/{eventId}/submissions/{submissionId}": {
+      "schema": "Submission",
+      "description": "Repository submissions"
+    },
+    "/events/{eventId}/analysisJobs/{jobId}": {
+      "schema": "AnalysisJob",
+      "description": "Forensics analysis runs"
+    },
+    "/events/{eventId}/schemas/{schemaId}": {
+      "schema": "EvaluationSchema",
+      "description": "Evaluation rubrics"
+    },
+    "/events/{eventId}/evaluations/{evaluationId}": {
+      "schema": "Evaluation",
+      "description": "Judge evaluations and scores"
+    },
+    "/events/{eventId}/leaderboard/{leaderboardId}": {
+      "schema": "Leaderboard",
+      "description": "Published official leaderboard standings"
+    },
+    "/auditLogs/{logId}": {
+      "schema": "AuditLog",
+      "description": "Privileged audit trail"
+    },
+    "/notifications/{userId}/items/{notificationId}": {
+      "schema": "Notification",
+      "description": "User notifications"
+    }
+  }
+}

@@ -1,0 +1,315 @@
+@import "tailwindcss";
+
+@theme {
+  --color-surface: #ffffff;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #fbfbf6;
+  --color-surface-container: #f5f5ee;
+  --color-surface-container-high: #e7e5dc;
+  --color-surface-container-highest: #d6d3c9;
+  --color-surface-bright: #ffffff;
+  --color-surface-tint: #16a34a;
+  --color-primary: #16a34a;
+  --color-primary-container: #15803d;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #ffffff;
+  --color-secondary: #ca8a04;
+  --color-secondary-container: #a16207;
+  --color-on-secondary: #ffffff;
+  --color-on-secondary-container: #ffffff;
+  --color-tertiary: #ea580c;
+  --color-tertiary-container: #c2410c;
+  --color-on-tertiary: #ffffff;
+  --color-on-tertiary-container: #ffffff;
+  --color-error: #dc2626;
+  --color-error-container: #fee2e2;
+  --color-on-error: #ffffff;
+  --color-on-surface: #1c1917;
+  --color-on-surface-variant: #57534e;
+  --color-outline: #a8a29e;
+  --color-outline-variant: #e7e5e4;
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  body {
+    background-color: #faf9f4;
+    color: #1c1917;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  code, pre, .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+/* =========================================================================
+   Bauhaus + Claymorphism Fusion Design System
+   "Form follows function" - Bold geometry (circles, semicircles, rectangles)
+   with tactile claymorphic extruded depth and solid light yellow/green/orange.
+   ========================================================================= */
+
+/* Bauhaus Geometric Blocks with Claymorphic Extrusion */
+.clay-card {
+  background: #ffffff;
+  border-radius: 1.5rem;
+  box-shadow:
+    8px 12px 24px -4px rgba(120, 113, 108, 0.12),
+    -6px -6px 16px rgba(255, 255, 255, 0.98),
+    inset 2px 2px 4px rgba(255, 255, 255, 0.95),
+    inset -2px -2px 4px rgba(120, 113, 108, 0.05);
+  border: 2px solid #e7e5dc;
+}
+
+.clay-card-yellow {
+  background: #fefce8;
+  border-radius: 1.5rem;
+  box-shadow:
+    8px 12px 24px -4px rgba(234, 179, 8, 0.16),
+    -6px -6px 16px rgba(255, 255, 255, 0.98),
+    inset 2px 2px 4px rgba(255, 255, 255, 0.95),
+    inset -2px -2px 4px rgba(234, 179, 8, 0.1);
+  border: 2px solid #fde047;
+}
+
+.clay-card-green {
+  background: #f0fdf4;
+  border-radius: 1.5rem;
+  box-shadow:
+    8px 12px 24px -4px rgba(34, 197, 94, 0.16),
+    -6px -6px 16px rgba(255, 255, 255, 0.98),
+    inset 2px 2px 4px rgba(255, 255, 255, 0.95),
+    inset -2px -2px 4px rgba(34, 197, 94, 0.1);
+  border: 2px solid #86efac;
+}
+
+.clay-card-orange {
+  background: #fff7ed;
+  border-radius: 1.5rem;
+  box-shadow:
+    8px 12px 24px -4px rgba(249, 115, 22, 0.16),
+    -6px -6px 16px rgba(255, 255, 255, 0.98),
+    inset 2px 2px 4px rgba(255, 255, 255, 0.95),
+    inset -2px -2px 4px rgba(249, 115, 22, 0.1);
+  border: 2px solid #fdba74;
+}
+
+/* Bauhaus Pure Geometric Shape Classes */
+.bauhaus-circle {
+  border-radius: 9999px;
+  box-shadow:
+    6px 8px 18px -2px rgba(120, 113, 108, 0.15),
+    -4px -4px 12px rgba(255, 255, 255, 0.98),
+    inset 2px 2px 4px rgba(255, 255, 255, 0.9),
+    inset -2px -2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.bauhaus-semicircle-top {
+  border-radius: 9999px 9999px 0 0;
+  box-shadow:
+    6px 8px 18px -2px rgba(120, 113, 108, 0.14),
+    inset 2px 2px 4px rgba(255, 255, 255, 0.9);
+}
+
+.bauhaus-semicircle-right {
+  border-radius: 0 9999px 9999px 0;
+  box-shadow:
+    6px 8px 18px -2px rgba(120, 113, 108, 0.14),
+    inset 2px 2px 4px rgba(255, 255, 255, 0.9);
+}
+
+.bauhaus-quarter-circle {
+  border-radius: 2.5rem 0 0 0;
+  box-shadow:
+    6px 8px 18px -2px rgba(120, 113, 108, 0.14),
+    inset 2px 2px 4px rgba(255, 255, 255, 0.9);
+}
+
+.bauhaus-divider {
+  height: 2px;
+  background-color: #1c1917;
+  opacity: 0.12;
+}
+
+.bauhaus-divider-bold {
+  height: 3px;
+  background-color: #1c1917;
+}
+
+/* Bauhaus Tactile Clay Buttons - Form Follows Function */
+.clay-btn {
+  background: #ffffff;
+  border-radius: 1rem;
+  box-shadow:
+    5px 7px 15px -2px rgba(120, 113, 108, 0.18),
+    -3px -3px 10px rgba(255, 255, 255, 0.95),
+    inset 1.5px 1.5px 3px rgba(255, 255, 255, 0.8),
+    inset -1.5px -1.5px 3px rgba(120, 113, 108, 0.08);
+  border: 2px solid #e7e5dc;
+  transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.clay-btn:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    7px 10px 20px -2px rgba(120, 113, 108, 0.22),
+    -4px -4px 12px rgba(255, 255, 255, 0.98);
+}
+.clay-btn:active {
+  transform: translateY(1.5px) scale(0.98);
+  box-shadow:
+    2px 3px 8px rgba(120, 113, 108, 0.12),
+    inset 2px 2px 4px rgba(120, 113, 108, 0.12);
+}
+
+.clay-btn-primary {
+  background: #16a34a;
+  color: #ffffff;
+  border-radius: 1rem;
+  box-shadow:
+    6px 8px 18px -2px rgba(22, 163, 74, 0.35),
+    -3px -3px 10px rgba(255, 255, 255, 0.8),
+    inset 1.5px 1.5px 3px rgba(255, 255, 255, 0.4),
+    inset -1.5px -1.5px 3px rgba(0, 0, 0, 0.2);
+  border: 2px solid #15803d;
+  transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.clay-btn-primary:hover {
+  background: #15803d;
+  transform: translateY(-2px);
+  box-shadow:
+    8px 12px 22px -2px rgba(22, 163, 74, 0.42),
+    -4px -4px 12px rgba(255, 255, 255, 0.85);
+}
+.clay-btn-primary:active {
+  transform: translateY(1.5px) scale(0.98);
+  box-shadow:
+    3px 4px 10px rgba(22, 163, 74, 0.25),
+    inset 2px 2px 4px rgba(0, 0, 0, 0.25);
+}
+
+.clay-btn-orange {
+  background: #ea580c;
+  color: #ffffff;
+  border-radius: 1rem;
+  box-shadow:
+    6px 8px 18px -2px rgba(234, 88, 12, 0.35),
+    -3px -3px 10px rgba(255, 255, 255, 0.8),
+    inset 1.5px 1.5px 3px rgba(255, 255, 255, 0.4),
+    inset -1.5px -1.5px 3px rgba(0, 0, 0, 0.2);
+  border: 2px solid #c2410c;
+  transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.clay-btn-orange:hover {
+  background: #c2410c;
+  transform: translateY(-2px);
+}
+.clay-btn-orange:active {
+  transform: translateY(1.5px) scale(0.98);
+}
+
+.clay-btn-yellow {
+  background: #fef08a;
+  color: #713f12;
+  border-radius: 1rem;
+  box-shadow:
+    5px 7px 15px -2px rgba(202, 138, 4, 0.22),
+    -3px -3px 10px rgba(255, 255, 255, 0.9),
+    inset 1.5px 1.5px 3px rgba(255, 255, 255, 0.8),
+    inset -1.5px -1.5px 3px rgba(161, 98, 7, 0.12);
+  border: 2px solid #eab308;
+  transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.clay-btn-yellow:hover {
+  background: #fde047;
+  transform: translateY(-2px);
+}
+.clay-btn-yellow:active {
+  transform: translateY(1.5px) scale(0.98);
+}
+
+.clay-btn-google {
+  background: #ffffff;
+  color: #1c1917;
+  border-radius: 1rem;
+  box-shadow:
+    6px 8px 20px -3px rgba(120, 113, 108, 0.14),
+    -4px -4px 14px rgba(255, 255, 255, 0.95),
+    inset 2px 2px 4px rgba(255, 255, 255, 0.95),
+    inset -2px -2px 4px rgba(120, 113, 108, 0.05);
+  border: 2px solid #e7e5dc;
+  transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.clay-btn-google:hover {
+  transform: translateY(-2px);
+  border-color: #1c1917;
+  box-shadow:
+    8px 12px 24px -3px rgba(120, 113, 108, 0.18),
+    -6px -6px 16px rgba(255, 255, 255, 0.98);
+}
+.clay-btn-google:active {
+  transform: translateY(1.5px) scale(0.98);
+  box-shadow:
+    3px 4px 10px rgba(120, 113, 108, 0.1),
+    inset 2px 2px 4px rgba(120, 113, 108, 0.08);
+}
+
+.clay-pill {
+  border-radius: 9999px;
+  box-shadow:
+    3px 4px 10px -2px rgba(120, 113, 108, 0.12),
+    -2px -2px 6px rgba(255, 255, 255, 0.95),
+    inset 1px 1px 2px rgba(255, 255, 255, 0.95),
+    inset -1px -1px 2px rgba(120, 113, 108, 0.06);
+  border: 1.5px solid currentColor;
+  transition: all 0.15s ease-out;
+}
+
+.clay-input {
+  background: #ffffff;
+  border-radius: 0.875rem;
+  box-shadow:
+    inset 2px 2px 5px rgba(120, 113, 108, 0.08),
+    inset -2px -2px 5px rgba(255, 255, 255, 0.95);
+  border: 2px solid #e7e5dc;
+  transition: all 0.15s ease-in-out;
+}
+.clay-input:focus {
+  outline: none;
+  border-color: #16a34a;
+  box-shadow:
+    inset 1.5px 1.5px 3px rgba(22, 163, 74, 0.1),
+    0 0 0 3px rgba(22, 163, 74, 0.15);
+}
+
+/* Minimalist Touch Target Helper */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Custom Laboratory Parchment Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d6d3c9;
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a29e;
+}

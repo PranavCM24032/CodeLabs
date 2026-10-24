@@ -1,0 +1,1474 @@
+Bhai, now we’ll turn the GitTrack plan into one complete master prompt for Google AI Studio to build the actual working application, not just the UI.
+
+This version uses your chosen stack — React + TypeScript + TSX + Firebase — and includes the complete participant workflow, Admin-as-Judge workspace, your Superadmin control center, repository forensics, dynamic evaluation schemas, scoring, leaderboards, and mobile responsiveness.
+
+The key instruction is that Google AI Studio must inspect the existing project, build in phases, and connect every screen to real functionality rather than generating a beautiful but non-functional mockup.
+
+Copy the entire prompt below into Google AI Studio Build mode. It instructs the coding agent to build the complete GitTrack application, including its frontend, Firebase backend, security rules, workflows, and setup instructions.
+
+# GITTRACK — COMPLETE FULL-STACK APPLICATION BUILD MASTER PROMPT
+
+## 1. YOUR MISSION
+
+Build a complete, functional, production-oriented web application named **GitTrack**.
+
+GitTrack is a multi-user hackathon management, repository intelligence, code similarity analysis, judging, evaluation, scoring, and leaderboard platform.
+
+This application must manage the entire lifecycle of a hackathon:
+
+Event creation → User registration → Team formation → Problem selection → Repository submission → Repository snapshot → Code analysis → Judge evaluation → Score approval → Leaderboard publication → Participant results → Audit and reports.
+
+This is a real application, not a landing-page-only project, UI prototype, or collection of disconnected dashboards.
+
+Implement the complete application using the existing project, connect the screens to Firebase, enforce role-based permissions, and make every major workflow functional.
+
+Do not stop after creating the UI. Do not deliver only a plan. Inspect the project first, then implement the application in structured phases until the core product works end to end.
+
+If an external credential or service configuration is unavailable, build the integration properly, show its configuration status, and provide setup instructions. Never pretend that an unconfigured integration is working.
+
+---
+
+# 2. MANDATORY TECHNOLOGY STACK
+
+Use this stack throughout the application.
+
+### Frontend
+
+- React
+- TypeScript
+- TSX for React components
+- Vite if the existing project uses Vite
+- React Router for routing, unless an equivalent router already exists
+- Tailwind CSS and shadcn/ui if compatible with the existing project
+- Lucide icons or the project's existing icon library
+- Recharts for meaningful charts where appropriate
+
+### Backend and infrastructure
+
+- Firebase Authentication
+- Cloud Firestore
+- Firebase Cloud Functions using TypeScript
+- Firebase Storage for authorized attachments and report files
+- Firestore Security Rules
+- Firebase Storage Security Rules
+- Firebase App Check where supported and configured
+- Firebase Emulator Suite for local development and testing
+
+### Repository providers
+
+Support:
+
+- GitHub
+- GitLab
+- Bitbucket
+
+Use official provider APIs through trusted backend functions or another secure server-side integration layer.
+
+### Architecture restrictions
+
+1. Do not introduce Python FastAPI, PostgreSQL, MongoDB, or a separate database as the main application backend.
+2. Do not replace Firebase with another backend.
+3. Do not create duplicate React applications or duplicate Firebase initializations.
+4. Reuse the existing package configuration, components, routes, and design system where practical.
+5. Use TypeScript instead of introducing unnecessary JavaScript files.
+6. Use `.tsx` for React UI components and `.ts` for utilities, types, Firebase logic, and Cloud Functions.
+7. Keep provider credentials and privileged operations on the trusted backend.
+8. Never put private keys, service-account JSON, OAuth client secrets, or repository access tokens in frontend code.
+9. Do not create a fake backend with hardcoded arrays as the final implementation.
+10. Do not use browser local storage as the authoritative database for users, marks, roles, scores, or event state.
+
+---
+
+# 3. FIRST: INSPECT THE EXISTING PROJECT
+
+Before modifying any files:
+
+1. Inspect the complete project structure.
+2. Read `package.json`, Vite configuration, TypeScript configuration, routing, current components, styles, and Firebase setup.
+3. Identify existing reusable UI and working functionality.
+4. Check whether Firebase is already initialized.
+5. Check whether authentication, Firestore, Storage, or Cloud Functions already exist.
+6. Identify missing environment variables and configuration.
+7. Preserve working code and avoid unnecessary rewrites.
+8. Reuse existing dependencies wherever possible.
+9. Do not create a second Firebase app instance.
+10. Do not overwrite environment files or remove existing features without a clear reason.
+
+Then begin implementation in phases. Keep the application runnable after each major phase.
+
+If a Firebase project or credentials are not yet available, implement the code and documented configuration needed for integration, and provide a clear setup screen or instructions instead of inventing credentials.
+
+---
+
+# 4. EXACT USER ROLE MODEL
+
+There are exactly three application roles.
+
+## Role A: Participant
+
+Every normal public registration creates a Participant account.
+
+Participants can:
+
+- Browse public events.
+- Register for eligible events.
+- Create or join teams.
+- Invite teammates.
+- Select problem statements.
+- Submit authorized repository URLs.
+- View their own submission status.
+- View their own published evaluation marks.
+- Read feedback released to them.
+- View public leaderboards.
+- Manage their own profile and notification preferences.
+
+Participants cannot:
+
+- Grant roles.
+- Access admin dashboards.
+- Read other teams' private evaluations.
+- View unpublished scores.
+- Access private code-similarity evidence.
+- Change official scores or rankings.
+- Publish results.
+
+## Role B: Admin — Also the Judge
+
+There is no separate Judge role. Admin is the judge role.
+
+Admins can access events explicitly assigned to them and only the permissions granted for those events.
+
+Core judging capabilities:
+
+- View assigned teams.
+- Review assigned problem statements.
+- Inspect authorized repository snapshots.
+- Review commit timelines and contributor activity.
+- Inspect code-similarity findings and evidence.
+- Enter criterion-level marks.
+- Add comments and evaluation notes.
+- Save drafts.
+- Submit evaluations.
+- View their permitted evaluation history.
+
+Additional event-management permissions may be granted by the Superadmin:
+
+- Manage team registrations.
+- Manage problem assignments.
+- Assign judging work within delegated limits.
+- Monitor analysis jobs.
+- Review evaluation completion.
+- Correct or return evaluations.
+- Prepare reports.
+- Preview or publish results only when explicitly authorized.
+
+An Admin must never automatically receive global Superadmin permissions.
+
+## Role C: Superadmin
+
+The Superadmin is the platform owner, controlled by me.
+
+The Superadmin can:
+
+- Manage users and account status.
+- Grant and revoke Admin privileges.
+- Create and manage all events.
+- Assign Admins to events.
+- Configure problem statements.
+- Build evaluation schemas.
+- Configure scoring and leaderboard rules.
+- Review evaluations.
+- Authorize mark overrides with mandatory audit reasons.
+- Publish or correct results.
+- Configure repository-analysis settings.
+- Access global reports and audit logs.
+- Manage platform settings.
+
+## Privilege escalation protection
+
+This is a critical requirement.
+
+- Never expose an Admin or Superadmin role selector in public registration.
+- Never trust a client-supplied role.
+- Never allow users to write their own privileged role assignments.
+- Protect role assignments using Firestore Security Rules and trusted Cloud Functions.
+- Do not make the first Superadmin account dependent on a public signup flow.
+- Provide a secure initial Superadmin provisioning procedure using a trusted administrative environment.
+- Protect role revocation and suspension.
+- Recheck permissions on sensitive backend operations.
+- A user who loses privileges must not retain access through cached frontend state.
+- Do not allow an Admin to grant themselves additional privileges.
+- Keep event-specific permissions separate from platform-wide roles.
+
+A user may have multiple explicitly authorized roles if needed, but event assignments and conflict-of-interest restrictions must still apply.
+
+---
+
+# 5. APPLICATION ROUTING
+
+Create a clean route structure and protect routes using verified authentication and authorization.
+
+## Public routes
+
+- `/`
+- `/events`
+- `/events/:eventId`
+- `/leaderboard`
+- `/login`
+- `/register`
+- `/forgot-password`
+- `/access-denied`
+- `/account-suspended`
+- `*` for not found
+
+## Participant routes
+
+- `/app/dashboard`
+- `/app/events`
+- `/app/events/:eventId`
+- `/app/teams`
+- `/app/teams/create`
+- `/app/teams/join`
+- `/app/teams/:teamId`
+- `/app/problems`
+- `/app/problems/:problemId`
+- `/app/submissions`
+- `/app/submissions/:submissionId`
+- `/app/results`
+- `/app/notifications`
+- `/app/settings`
+
+## Admin routes
+
+- `/admin/dashboard`
+- `/admin/events`
+- `/admin/events/:eventId`
+- `/admin/judging`
+- `/admin/teams/:teamId`
+- `/admin/analysis/:submissionId`
+- `/admin/evaluations`
+- `/admin/evaluations/:evaluationId`
+- `/admin/evaluation-history`
+- `/admin/reports`
+- `/admin/settings`
+
+## Superadmin routes
+
+- `/superadmin/dashboard`
+- `/superadmin/users`
+- `/superadmin/users/:userId`
+- `/superadmin/events`
+- `/superadmin/events/create`
+- `/superadmin/events/:eventId`
+- `/superadmin/assignments`
+- `/superadmin/problems`
+- `/superadmin/problems/create`
+- `/superadmin/schemas`
+- `/superadmin/schemas/create`
+- `/superadmin/schemas/:schemaId`
+- `/superadmin/scoring`
+- `/superadmin/evaluations`
+- `/superadmin/evaluations/:evaluationId/override`
+- `/superadmin/analysis-settings`
+- `/superadmin/leaderboard`
+- `/superadmin/reports`
+- `/superadmin/audit-logs`
+- `/superadmin/settings`
+
+You may refine routes to fit the existing application, but preserve all major workflows.
+
+### Route protection
+
+Implement:
+
+- Authentication guard.
+- Participant guard.
+- Admin guard.
+- Superadmin guard.
+- Event assignment guard.
+- Resource ownership checks.
+- Permission-specific action guards.
+
+Show a loading state while permissions are being resolved. Never flash protected data before authorization finishes.
+
+Frontend route protection is only a usability layer. The backend and Firestore Rules must enforce the actual permissions.
+
+---
+
+# 6. GLOBAL UI AND DESIGN SYSTEM
+
+Create a premium developer-focused SaaS interface.
+
+Use a polished dark theme as the primary design direction:
+
+- Deep charcoal and navy backgrounds.
+- Slate-colored surfaces.
+- Near-white primary text.
+- Muted secondary text.
+- Electric blue primary actions.
+- Green success states.
+- Amber warning states.
+- Red error and destructive states.
+
+Use consistent typography, spacing, borders, icons, cards, buttons, forms, tables, dialogs, and status badges.
+
+Avoid:
+
+- Generic AI dashboard design.
+- Excessive gradients.
+- Excessive glassmorphism.
+- Random glowing elements.
+- Overloaded cards.
+- Huge empty dashboard areas.
+- Fake statistics presented as real data.
+- Decorative buttons without actions.
+- Inconsistent colors between role portals.
+
+### Responsive navigation
+
+Desktop:
+
+- Collapsible sidebar.
+- Top navigation bar.
+- Event selector when applicable.
+- Notification menu.
+- Profile menu.
+- Breadcrumbs for nested pages.
+
+Mobile:
+
+- Compact header.
+- Navigation drawer or suitable bottom navigation.
+- Single-column forms.
+- Responsive cards.
+- Large touch-friendly actions.
+- Mobile-friendly tables.
+- No horizontal page overflow.
+- Keyboard-safe forms.
+- No hover-only controls.
+
+Target phones starting at approximately 320px wide.
+
+Every major workflow must work on mobile, including team management, repository submission, evaluation, schema editing, score review, and leaderboard publication.
+
+Create reusable components instead of duplicating entire interfaces for each screen.
+
+---
+
+# 7. PUBLIC EXPERIENCE AND AUTHENTICATION
+
+Implement the public landing page with:
+
+- GitTrack branding.
+- Hero text: "Every Commit Tells a Story."
+- Product introduction.
+- Event directory preview.
+- Repository intelligence features.
+- Fair evaluation explanation.
+- Leaderboard preview.
+- Login and registration links.
+
+Implement public event browsing with search, status filters, event details, eligibility, dates, rules, and registration actions.
+
+### Authentication
+
+Use Firebase Authentication.
+
+Support Google sign-in and email authentication according to the configured providers.
+
+Implement:
+
+- Registration.
+- Login.
+- Logout.
+- Password reset where applicable.
+- Authentication errors.
+- Suspended-account handling.
+- Session restoration.
+- Loading states.
+- Profile initialization.
+- Account status validation.
+
+On registration:
+
+1. Create the Firebase Authentication account.
+2. Create the permitted user profile.
+3. Assign Participant access by default.
+4. Never accept a privileged role from registration form data.
+
+Keep profile data and privileged role assignments appropriately separated.
+
+### Initial Superadmin provisioning
+
+Implement a secure documented procedure for the first Superadmin.
+
+Use a trusted script, secured administrative command, or protected Cloud Function with appropriate credentials and verification.
+
+Do not implement a public bootstrap endpoint that grants Superadmin access to the first person who calls it.
+
+---
+
+# 8. PARTICIPANT WORKFLOWS
+
+Implement all participant screens with real Firebase data.
+
+## Participant dashboard
+
+Show:
+
+- Registered events.
+- Upcoming deadlines.
+- Team information.
+- Problem-selection status.
+- Submission status.
+- Recent notifications.
+- Published results.
+- Public leaderboard preview.
+
+## Team management
+
+Implement:
+
+- Create team.
+- Join team.
+- Invite members.
+- Accept and decline invitations.
+- View team membership.
+- Team leader controls.
+- Team-size restrictions.
+- Prevent duplicate memberships where prohibited.
+- Prevent unauthorized changes to another team's membership.
+
+Use Firestore transactions or another trusted concurrency-safe mechanism for operations such as joining teams and enforcing capacity limits.
+
+## Problem statements
+
+Implement:
+
+- Browse.
+- Search and filters.
+- View details.
+- Select problem.
+- Change selection if allowed.
+- Enforce eligibility.
+- Enforce deadlines.
+- Enforce capacity.
+- Prevent duplicate or conflicting selections according to event configuration.
+
+## Repository submission
+
+Support GitHub, GitLab, and Bitbucket.
+
+Implement:
+
+- Provider selection.
+- Repository URL validation.
+- Authorization or access verification.
+- Branch selection where supported.
+- Commit identification.
+- Submission status.
+- Submission history.
+- Deadline enforcement.
+- Resubmission rules.
+- Frozen commit SHA display.
+
+Do not expose private tokens or require participants to put secrets into an ordinary repository URL field.
+
+## Participant results
+
+Participants must see:
+
+- Their own released marks.
+- Round-wise totals.
+- Criterion-wise scores.
+- Maximum marks.
+- Released feedback.
+- Publication status.
+- Published final score if configured.
+
+Do not show missing or unpublished marks as zero.
+
+Do not reveal internal judge comments unless explicitly released.
+
+---
+
+# 9. ADMIN / JUDGE WORKSPACE
+
+Implement an Admin dashboard with:
+
+- Assigned events.
+- Assigned teams.
+- Pending evaluations.
+- Draft evaluations.
+- Submitted evaluations.
+- Relevant deadlines.
+- Recent activity.
+
+## Judging queue
+
+Allow Admins to view assigned teams and evaluation tasks, with filters by status, round, and deadline.
+
+Do not show all platform teams by default.
+
+## Team review
+
+Display:
+
+- Team details.
+- Problem statement.
+- Repository URL.
+- Frozen commit SHA.
+- Commit timeline.
+- Contributor activity.
+- Relevant code-analysis evidence.
+- Evaluation status.
+
+## Evaluation form
+
+Render the active event's published evaluation schema dynamically.
+
+For each criterion display:
+
+- Label.
+- Description.
+- Maximum marks.
+- Required/optional status.
+- Configured input type.
+- Score input or rubric selector.
+- Comments field where configured.
+- Validation state.
+
+Support:
+
+- Save draft.
+- Resume draft.
+- Submit evaluation.
+- Return for correction where permitted.
+- View permitted history.
+
+Validate all criterion scores on the trusted backend.
+
+The frontend may show a provisional subtotal, but the authoritative score must be calculated by trusted server-side logic.
+
+Do not permit scores below zero or above the criterion maximum. Validate rubric values and required fields.
+
+Do not assume that every missing optional criterion equals zero. Implement the behavior specified by the event's scoring configuration.
+
+## Evaluation locking
+
+Once submitted, apply the configured edit policy.
+
+If an evaluation is finalized, require an authorized correction workflow rather than silently replacing the finalized record.
+
+---
+
+# 10. SUPERADMIN CONTROL CENTER
+
+Build a complete Superadmin dashboard.
+
+## User management
+
+Implement:
+
+- Search users.
+- Filter by role and account status.
+- View profile.
+- Grant Admin access.
+- Revoke Admin access.
+- Suspend and reactivate accounts.
+- View event assignments.
+- Record role changes in the audit log.
+
+Only the Superadmin can manage privileged role assignments.
+
+## Event management
+
+Implement event creation and editing with:
+
+- Name.
+- Description.
+- Dates and deadlines.
+- Eligibility.
+- Team-size limits.
+- Rounds.
+- Problem statement configuration.
+- Evaluation schemas.
+- Scoring rules.
+- Admin assignments.
+- Publication settings.
+- Draft, published, active, completed, and archived lifecycle states.
+
+Use a multi-step event creation wizard with validation and a review step.
+
+## Admin assignments
+
+Implement:
+
+- Assign Admin to event.
+- Assign rounds.
+- Assign teams or groups.
+- Grant specific event-management permissions.
+- Revoke assignments.
+- Detect conflicts.
+- Review assignment history.
+
+An Admin must not gain permissions simply because they know an event ID.
+
+## Problem statement management
+
+Implement:
+
+- Create.
+- Edit.
+- Preview.
+- Publish.
+- Archive.
+- Assign to events.
+- Configure category, difficulty, eligibility, capacity, and selection rules.
+- Manage attachments securely.
+
+## Platform settings
+
+Include:
+
+- Platform identity.
+- Authentication provider status.
+- Repository integration status.
+- Analysis configuration.
+- Data retention settings.
+- Notification configuration.
+- Feature flags where needed.
+
+Never display secret values in plaintext.
+
+---
+
+# 11. DYNAMIC EVALUATION SCHEMA BUILDER
+
+This is a core differentiating feature of GitTrack.
+
+The Superadmin must create, edit, version, publish, and retire evaluation schemas without changing application source code.
+
+Build a visual schema editor.
+
+### Schema fields
+
+Each schema should support:
+
+- Schema ID.
+- Name.
+- Description.
+- Event and round assignment.
+- Version number.
+- Status.
+- Total possible marks.
+- Criteria list.
+- Publication policy.
+- Created and updated timestamps.
+- Created-by and published-by references.
+
+### Criterion fields
+
+Support:
+
+- Stable criterion ID.
+- Label.
+- Description.
+- Type.
+- Maximum marks.
+- Required or optional status.
+- Weight.
+- Ordering.
+- Rubric options where applicable.
+- Input validation rules.
+
+Supported input types:
+
+- Numeric score.
+- Rubric selection.
+- Dropdown selection.
+- Text comment.
+- Evidence reference where applicable.
+
+### Schema builder actions
+
+Implement:
+
+- Add criterion.
+- Edit criterion.
+- Remove criterion.
+- Reorder criteria.
+- Change maximum marks.
+- Configure required status.
+- Configure weights.
+- Preview evaluation form.
+- Validate schema.
+- Save draft.
+- Publish a new version.
+- Retire an obsolete version.
+
+Provide an optional validated JSON editor as an advanced tool, but the visual builder must be the primary interface.
+
+### Schema versioning
+
+- Draft schemas may be edited.
+- Published versions must be identifiable and versioned.
+- Finalized evaluations must retain the exact schema version used.
+- Publishing a new schema must not silently change old marks or historical totals.
+- Changes to active events must follow an explicit migration or confirmation workflow.
+- Store a schema snapshot or immutable version reference in each evaluation.
+
+Validate total marks and scoring configuration before publication.
+
+---
+
+# 12. SCORE ENGINE AND LEADERBOARD
+
+Implement score calculation through trusted Cloud Functions.
+
+Never trust client-supplied totals, weighted scores, ranks, or approval flags.
+
+### Configurable scoring
+
+Support:
+
+- Round-wise maximum marks.
+- Raw score totals.
+- Weighted totals.
+- Multiple-judge aggregation.
+- Average or median aggregation where configured.
+- Authorized final reviewer score where configured.
+- Qualification thresholds.
+- Missing-evaluation handling.
+- Tie-break sequences.
+- Round eligibility.
+- Publication eligibility.
+
+Store the scoring configuration and version used for calculations.
+
+### Evaluation states
+
+Distinguish:
+
+- Draft.
+- Submitted.
+- Returned for correction.
+- Approved.
+- Finalized.
+- Published.
+
+Only evaluations that satisfy the event's eligibility and approval requirements may contribute to an official published leaderboard.
+
+### Leaderboard
+
+Implement:
+
+- Rank.
+- Team name.
+- Published total.
+- Round-wise scores if configured.
+- Tie indicators.
+- Publication status.
+- Last updated time.
+- Search and filters.
+- Pagination where necessary.
+
+Support real-time updates through Firestore listeners when useful.
+
+Keep public leaderboard data separate from private evaluations. Only publish fields explicitly approved for public viewing.
+
+### Corrections after publication
+
+If an authorized user changes a published score:
+
+1. Require a reason.
+2. Validate permissions.
+3. Record the previous and new values.
+4. Recalculate affected rankings.
+5. Update public records according to the correction policy.
+6. Record the action in the audit log.
+
+Never silently modify a published result.
+
+---
+
+# 13. REPOSITORY INTELLIGENCE AND CODE FORENSICS
+
+Implement a repository-analysis subsystem for GitHub, GitLab, and Bitbucket.
+
+Use official APIs and authorized repository access.
+
+## Repository snapshot
+
+When a submission is accepted:
+
+- Record provider.
+- Record repository identity.
+- Record branch.
+- Resolve the exact commit SHA.
+- Save submission timestamp.
+- Save snapshot status.
+- Associate analysis jobs with the snapshot.
+
+A branch URL alone is not a reproducible snapshot. The analysis must identify the exact commit inspected.
+
+If a repository changes later, do not silently replace the analyzed snapshot.
+
+## Commit timeline
+
+Collect authorized metadata such as:
+
+- Commit timestamps.
+- Commit identifiers.
+- Commit messages where accessible.
+- Author and committer identities as provided by the source.
+- File changes.
+- Insertions and deletions.
+- Contributor activity.
+
+Provide timeline filters and readable charts.
+
+## Late bulk-upload indicators
+
+Identify observations such as:
+
+- Large numbers of files introduced in a short period.
+- Unusually large late commits.
+- Major activity concentrated close to the deadline.
+- Sudden repository-history changes where observable.
+
+Present these as indicators requiring human interpretation, not proof of misconduct.
+
+## Code similarity analysis
+
+Build an extensible similarity-analysis pipeline that can:
+
+- Normalize source code.
+- Tokenize supported programming languages.
+- Compare code fragments.
+- Calculate similarity metrics.
+- Exclude generated files and configured vendored dependencies.
+- Ignore common templates where configured.
+- Identify matching file regions.
+- Store source references and line ranges.
+- Associate findings with authorized submissions.
+
+Use token or n-gram comparison as a practical initial implementation. Add language-aware parsing or AST comparison where feasible.
+
+Do not claim support for a language or algorithm unless it is actually implemented and tested.
+
+## Similarity findings interface
+
+Display:
+
+- Similarity score or metric with its definition.
+- Matching regions.
+- File names.
+- Line ranges.
+- Relevant source references.
+- Evidence snippets.
+- Review status.
+- Reviewer notes.
+- Analysis timestamp.
+- Confidence or severity only when defined by the implemented methodology.
+
+Allow authorized reviewers to mark findings as:
+
+- Unreviewed.
+- Under review.
+- Needs explanation.
+- Reviewed.
+- Dismissed with reason.
+- Escalated for further investigation.
+
+Never automatically declare a team guilty of plagiarism.
+
+## AI-authorship limitations
+
+Do not generate an exact percentage of AI-written code based only on source code or commit patterns.
+
+Do not claim to identify AI authorship with certainty.
+
+Focus on observable repository history, similarity evidence, and transparent review indicators.
+
+## Integration failures
+
+Handle:
+
+- Invalid repository URL.
+- Private repository without authorization.
+- Expired provider authorization.
+- API rate limits.
+- Unsupported repository.
+- Inaccessible commit.
+- Partial history.
+- Missing files.
+- Failed analysis.
+- Retryable jobs.
+
+Show the difference between analysis queued, running, completed, partially completed, and failed.
+
+Never fabricate analysis results.
+
+---
+
+# 14. FIRESTORE DATA MODEL
+
+Design a scalable Firestore data model with appropriate subcollections and references.
+
+Include the following logical entities:
+
+### Identity and authorization
+
+- `users`
+- `roleAssignments`
+- `eventAssignments`
+- `notifications`
+
+### Events and participation
+
+- `events`
+- `teams`
+- `teamMembers`
+- `teamInvitations`
+- `problemStatements`
+- `problemSelections`
+
+### Repositories and analysis
+
+- `submissions`
+- `repositorySnapshots`
+- `analysisJobs`
+- `analysisFindings`
+
+### Evaluation and scoring
+
+- `evaluationSchemas`
+- `evaluations`
+- `scoreCalculations`
+- `leaderboards`
+
+### Administration
+
+- `auditLogs`
+- `platformSettings`
+
+Use subcollections when appropriate for:
+
+- Evaluation criteria scores.
+- Evaluation revisions.
+- Team memberships.
+- Analysis evidence.
+- Event-specific configuration.
+
+Define TypeScript interfaces and validation schemas for all important documents.
+
+Use consistent timestamps and status enums.
+
+Account for:
+
+- Document references.
+- Ownership.
+- Event scope.
+- Pagination.
+- Query indexes.
+- Concurrent writes.
+- Duplicate-prevention mechanisms.
+- Transaction limits.
+- Document size limits.
+- Immutable historical records.
+- Retention policies.
+
+Firestore does not provide general-purpose relational uniqueness constraints. Enforce uniqueness and capacity restrictions using transaction-safe document patterns or trusted server operations.
+
+Do not duplicate large repository contents or unbounded audit histories into a single document.
+
+Store large evidence files in Storage when appropriate and keep authorized metadata references in Firestore.
+
+---
+
+# 15. FIREBASE SECURITY RULES AND TRUSTED BACKEND
+
+This is a mandatory requirement.
+
+Build security rules and trusted Cloud Functions alongside the application.
+
+### Authentication
+
+Verify Firebase Authentication identity for protected operations.
+
+### Authorization
+
+Verify:
+
+- Actual privileged role.
+- Account status.
+- Event assignment.
+- Specific delegated permission.
+- Resource ownership.
+- Team membership.
+- Evaluation assignment.
+- Resource lifecycle status.
+
+### Firestore Rules
+
+Implement restrictive rules for:
+
+- User profiles.
+- Role assignments.
+- Events.
+- Teams and memberships.
+- Problem selections.
+- Submissions.
+- Repository snapshots.
+- Analysis findings.
+- Evaluation schemas.
+- Evaluations.
+- Public leaderboard documents.
+- Audit logs.
+
+Do not use broad allow-all rules.
+
+Do not trust hidden buttons or frontend route guards.
+
+### Cloud Functions
+
+Use trusted backend functions for sensitive operations such as:
+
+- Privileged role changes.
+- Secure Superadmin provisioning workflow.
+- Event assignment changes.
+- Team capacity enforcement.
+- Problem selection enforcement.
+- Repository URL validation and snapshot creation.
+- Provider API integration.
+- Analysis job creation and updates.
+- Evaluation submission and finalization.
+- Score calculations.
+- Evaluation approval.
+- Mark overrides.
+- Leaderboard publication.
+- Audit log creation.
+
+Use transactions or idempotent operations where needed.
+
+Validate all inputs and reject unauthorized or malformed requests.
+
+### Secrets
+
+Use Firebase Functions secrets or an appropriate managed secret system.
+
+Never commit secrets to source control.
+
+Never expose provider tokens in client responses or Firestore documents readable by participants.
+
+### Audit logs
+
+Record security-sensitive actions, including:
+
+- Role changes.
+- Event assignment changes.
+- Schema publication.
+- Evaluation submission.
+- Evaluation approval.
+- Mark overrides.
+- Leaderboard publication.
+- Published-result corrections.
+- Sensitive configuration changes.
+
+Include actor, action, target, timestamp, event context, and reason where applicable.
+
+Do not give normal users permission to edit or delete audit records.
+
+### Abuse prevention
+
+Implement appropriate:
+
+- Rate limits.
+- Request validation.
+- Pagination limits.
+- App Check enforcement where supported.
+- Repository URL allowlists and SSRF protections.
+- Safe file handling.
+- Input sanitization.
+- Least-privilege provider permissions.
+
+Never execute submitted repository code on the primary application server.
+
+---
+
+# 16. REAL-TIME UPDATES AND CONCURRENCY
+
+Use Firestore listeners selectively for:
+
+- Published leaderboard updates.
+- Submission status.
+- Evaluation status.
+- Notifications.
+- Event progress where useful.
+
+Do not attach unlimited listeners to every collection.
+
+Implement loading states, unsubscribe from listeners when components unmount, and handle errors.
+
+Prevent conflicting updates to:
+
+- Team membership.
+- Problem selection capacity.
+- Evaluation finalization.
+- Role assignments.
+- Score publication.
+
+Use trusted transactions, version checks, or idempotent backend operations.
+
+---
+
+# 17. REPORTS AND EXPORTS
+
+Implement useful reports for authorized roles.
+
+Admin reports:
+
+- Assigned team progress.
+- Submission status.
+- Evaluation completion.
+- Analysis status.
+- Event-level statistics.
+
+Superadmin reports:
+
+- Platform participation.
+- Event registration.
+- Evaluation completion.
+- Score distribution.
+- Analysis outcomes.
+- Leaderboard data.
+- Administrative audit history.
+
+Support CSV exports where appropriate.
+
+Respect access permissions when exporting. Do not include private fields in public exports.
+
+If generating a downloadable report, implement the export operation rather than displaying a non-functional Download button.
+
+---
+
+# 18. NOTIFICATIONS
+
+Implement in-app notifications for:
+
+- Registration updates.
+- Team invitations.
+- Problem selection.
+- Submission received.
+- Repository analysis completed or failed.
+- Evaluation submitted.
+- Correction requested.
+- Results published.
+- Event announcements.
+- Administrative actions where relevant.
+
+Notifications must respect event access and privacy.
+
+Do not expose another team's private marks through notification text.
+
+If email notifications are not configured, keep in-app notifications functional and clearly label email delivery as unconfigured.
+
+---
+
+# 19. TESTING REQUIREMENTS
+
+Write tests for critical application logic.
+
+At minimum, test:
+
+- Participant registration defaults.
+- Role assignment authorization.
+- Participant access denial to admin routes and data.
+- Admin event-assignment restrictions.
+- Superadmin role management.
+- Team capacity enforcement.
+- Problem selection deadlines.
+- Evaluation score bounds.
+- Required criterion validation.
+- Optional criterion behavior.
+- Schema version preservation.
+- Multiple-judge score aggregation.
+- Tie-break calculations.
+- Evaluation approval requirements.
+- Leaderboard publication permissions.
+- Mark override auditing.
+- Repository URL validation.
+- Unauthorized private repository access.
+- Private score isolation.
+- Public leaderboard field filtering.
+
+Use Firebase Emulator Suite where practical.
+
+Test Firestore Rules independently of the frontend.
+
+Do not consider a hidden button sufficient proof that access control works.
+
+---
+
+# 20. IMPLEMENTATION PHASES
+
+Build the app in the following order.
+
+## Phase 1 — Foundation
+
+- Inspect existing code.
+- Preserve existing functionality.
+- Establish or reuse Firebase initialization.
+- Establish TypeScript types.
+- Set up routing.
+- Create the shared design system.
+- Build responsive navigation.
+- Build loading and error states.
+
+## Phase 2 — Authentication and security
+
+- Implement Firebase Authentication.
+- Implement user profiles.
+- Implement secure role resolution.
+- Implement route guards.
+- Implement Firestore Rules.
+- Implement privileged role assignment.
+- Establish Superadmin provisioning.
+- Test unauthorized access.
+
+## Phase 3 — Events and teams
+
+- Implement event management.
+- Implement event directory.
+- Implement registration.
+- Implement team creation and membership.
+- Implement invitations.
+- Implement problem statement management.
+- Implement problem selection.
+
+## Phase 4 — Repository submission
+
+- Implement submission UI.
+- Implement repository validation.
+- Implement provider authorization architecture.
+- Implement frozen commit snapshots.
+- Implement submission status and history.
+- Handle provider failures.
+
+## Phase 5 — Repository analysis
+
+- Implement analysis job management.
+- Implement commit history.
+- Implement contributor metrics.
+- Implement similarity analysis.
+- Implement evidence storage and viewing.
+- Implement reviewer workflow.
+- Implement analysis status and retry handling.
+
+## Phase 6 — Dynamic evaluation
+
+- Implement schema builder.
+- Implement schema validation.
+- Implement versioning.
+- Implement evaluation forms.
+- Implement drafts and submission.
+- Implement approval and correction workflows.
+
+## Phase 7 — Scoring and leaderboard
+
+- Implement trusted score calculations.
+- Implement multi-judge aggregation.
+- Implement tie-break rules.
+- Implement leaderboard generation.
+- Implement publication.
+- Implement private participant result views.
+
+## Phase 8 — Superadmin and reporting
+
+- Complete role management.
+- Complete assignment management.
+- Complete scoring controls.
+- Complete mark overrides.
+- Complete audit logs.
+- Complete reports and exports.
+- Complete platform settings.
+
+## Phase 9 — Final quality and mobile
+
+- Test every major workflow.
+- Test mobile layouts.
+- Test authorization.
+- Fix build errors.
+- Fix console errors.
+- Verify loading and empty states.
+- Remove placeholder actions that appear functional.
+- Document deployment and setup.
+
+Do not stop after Phase 1 or Phase 2. Continue through the implementation phases within the available environment and clearly identify any remaining external configuration.
+
+---
+
+# 21. CODE QUALITY REQUIREMENTS
+
+Use:
+
+- Reusable components.
+- Clear TypeScript interfaces.
+- Centralized Firebase initialization.
+- Shared authorization utilities.
+- Typed data-access functions.
+- Centralized validation.
+- Error boundaries.
+- Consistent form handling.
+- Accessible controls.
+- Clear loading states.
+- Small, maintainable modules.
+
+Avoid:
+
+- One enormous component for the whole app.
+- Repeated Firebase initialization.
+- `any` throughout the codebase.
+- Hardcoded role checks scattered across unrelated files.
+- Client-side-only authorization.
+- Hardcoded production scores.
+- Fake API success responses.
+- Fake repository findings.
+- Swallowed exceptions.
+- Unhandled promises.
+- Non-functional links and buttons.
+- Dead-end forms.
+- Placeholder pages for core workflows.
+
+Use explicit interfaces and validation for sensitive operations.
+
+Keep secrets out of version control.
+
+---
+
+# 22. ENVIRONMENT AND SETUP DOCUMENTATION
+
+Create or update a README with:
+
+1. Project overview.
+2. Prerequisites.
+3. Installation commands.
+4. Development command.
+5. Build command.
+6. Type-check command.
+7. Firebase project setup.
+8. Authentication provider setup.
+9. Firestore database setup.
+10. Storage setup.
+11. Cloud Functions setup.
+12. Required environment variables.
+13. Secure Superadmin provisioning procedure.
+14. Firestore index deployment.
+15. Security Rules deployment.
+16. Emulator setup.
+17. Repository provider configuration.
+18. Secret management.
+19. Testing commands.
+20. Production deployment instructions.
+21. Known limitations and unconfigured integrations.
+
+Provide a safe example environment file containing placeholders only, such as a Firebase project ID placeholder and public Firebase configuration placeholders.
+
+Do not invent working credentials.
+
+Do not include private service-account keys.
+
+---
+
+# 23. FINAL ACCEPTANCE CRITERIA
+
+The application is not complete until the following are true:
+
+### Roles
+
+- Exactly three roles exist: Participant, Admin/Judge, Superadmin.
+- New public users receive Participant access.
+- Only authorized Superadmin operations can grant or revoke Admin privileges.
+- Admins can access only assigned events and delegated operations.
+- Participants cannot read private evaluation data.
+
+### Events
+
+- Superadmin can create and configure events.
+- Admin assignments work.
+- Participants can register and form teams.
+- Problem selection follows configured rules.
+
+### Repositories
+
+- Participants can submit repositories.
+- Repository snapshots identify exact commits.
+- Analysis jobs have real status tracking.
+- Repository evidence is linked to its source.
+- Unsupported integrations are clearly reported rather than simulated.
+
+### Evaluation
+
+- Superadmin can create and publish dynamic schemas.
+- Admins can evaluate assigned teams.
+- Score bounds and required fields are validated.
+- Historical schema versions remain preserved.
+- Finalized evaluations cannot be silently overwritten.
+
+### Scoring
+
+- Trusted backend calculates official scores.
+- Ranking follows configured rules.
+- Public leaderboards contain only permitted fields.
+- Results can be published and corrected with audit history.
+
+### Security
+
+- Firestore and Storage rules are restrictive.
+- Sensitive operations validate authorization on the backend.
+- Secrets are not exposed.
+- Role escalation is blocked.
+- Audit records exist for privileged changes.
+
+### UX
+
+- Every major route is implemented.
+- Navigation works.
+- Primary actions work.
+- Forms validate.
+- Loading, empty, success, and error states exist.
+- Mobile layouts work without horizontal overflow.
+- No core screen is merely a static mockup.
+
+### Delivery
+
+- The project builds successfully.
+- TypeScript errors are resolved.
+- Critical security and scoring logic has tests.
+- README and setup instructions are complete.
+- Missing external credentials or provider configuration are documented honestly.
+
+---
+
+# FINAL INSTRUCTION
+
+Start by inspecting the existing project. Then implement GitTrack using the stack and role model defined above.
+
+Prioritize correctness, security, maintainability, and complete end-to-end functionality over adding unnecessary animations or decorative UI.
+
+Do not replace working code unnecessarily. Do not fabricate real-world data. Do not claim an integration is complete when credentials or backend logic are missing.
+
+If the environment has a response or execution limit, finish a coherent implementation phase, preserve all working changes, report exactly what is complete and what remains, and continue from the existing code in subsequent steps.
+
+The goal is a fully functional, responsive GitTrack application that can be configured with Firebase and repository-provider credentials and then used to run an actual hackathon from registration through published results.
+
+## Before you run it
+
+Three practical points, bhai:
+
+1. Firebase must be configured. Google AI Studio can generate the code, but authentication, Firestore, Cloud Functions, and deployment need your actual Firebase project configuration.
+2. Repository analysis needs real integrations. GitHub, GitLab, and Bitbucket analysis cannot be fully operational until the appropriate API access and backend secrets are configured.
+3. Build in stages if needed. If AI Studio reaches its output or editing limit, tell it: “Continue implementing from the existing project. Inspect what is already complete, preserve it, and continue with the next unfinished implementation phase from the master prompt.”
+
+The most important thing is that GitTrack must be a working application with server-enforced permissions, not merely a polished frontend with fake scores and buttons.

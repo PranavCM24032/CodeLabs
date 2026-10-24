@@ -1,0 +1,140 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isBootstrappedAdmin() {
+      return isSignedIn() && request.auth.token.email == "pranavpaunikar.ml24@sbjit.edu.in";
+    }
+
+    function isAdmin() {
+      return isBootstrappedAdmin() || 
+        (isSignedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid)));
+    }
+
+    function isSuperadmin() {
+      return isBootstrappedAdmin() ||
+        (isSignedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role == 'superadmin');
+    }
+
+    // Users Collection
+    match /users/{userId} {
+      allow get: if isSignedIn();
+      allow list: if isSignedIn();
+      // Users can create their own profile as participant (cannot set self as admin/superadmin)
+      allow create: if isOwner(userId) &&
+        request.resource.data.uid == userId &&
+        request.resource.data.role == 'participant' &&
+        request.resource.data.status == 'active';
+      // User can update their own display name or photo, or admin can update status
+      allow update: if (isOwner(userId) &&
+        request.resource.data.role == resource.data.role &&
+        request.resource.data.status == resource.data.status) || isSuperadmin();
+      allow delete: if isSuperadmin();
+    }
+
+    // Admins index collection
+    match /admins/{userId} {
+      allow read: if isSignedIn();
+      allow write: if isSuperadmin();
+    }
+
+    // Events Collection
+    match /events/{eventId} {
+      allow read: if true; // Public directory can browse events
+      allow create, update, delete: if isAdmin();
+
+      // Event admin assignments
+      match /assignments/{assignmentId} {
+        allow read: if isAdmin();
+        allow write: if isSuperadmin();
+      }
+
+      // Teams
+      match /teams/{teamId} {
+        allow read: if true;
+        allow create: if isSignedIn();
+        allow update: if isSignedIn() && (
+          resource.data.leaderId == request.auth.uid ||
+          isAdmin()
+        );
+        allow delete: if isAdmin();
+      }
+
+      // Problems
+      match /problems/{problemId} {
+        allow read: if true;
+        allow write: if isAdmin();
+      }
+
+      // Submissions
+      match /submissions/{submissionId} {
+        allow read: if isSignedIn();
+        allow create: if isSignedIn();
+        allow update: if isSignedIn();
+        allow delete: if isAdmin();
+      }
+
+      // Analysis Jobs
+      match /analysisJobs/{jobId} {
+        allow read: if isSignedIn();
+        allow write: if isAdmin();
+      }
+
+      // Dynamic Evaluation Schemas
+      match /schemas/{schemaId} {
+        allow read: if isSignedIn();
+        allow write: if isAdmin();
+      }
+
+      // Evaluations (Judge scores)
+      match /evaluations/{evaluationId} {
+        // Participants can only see finalized/approved evaluations released for their team; admins see all
+        allow read: if isAdmin() || (
+          isSignedIn() && resource.data.status in ['approved', 'finalized']
+        );
+        allow create: if isAdmin();
+        allow update: if isAdmin();
+        allow delete: if isSuperadmin();
+      }
+
+      // Published Leaderboard
+      match /leaderboard/{leaderboardId} {
+        allow read: if true; // Public can see published leaderboard
+        allow write: if isAdmin();
+      }
+    }
+
+    // Audit logs (Strictly append-only / server / superadmin)
+    match /auditLogs/{logId} {
+      allow read: if isSuperadmin();
+      allow create: if isSignedIn();
+      allow update, delete: if false; // Immutable audit log
+    }
+
+    // Notifications
+    match /notifications/{userId}/items/{notificationId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow write: if isOwner(userId) || isAdmin();
+    }
+  }
+}

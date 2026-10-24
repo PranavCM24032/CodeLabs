@@ -1,0 +1,6 @@
+{
+  "name": "codeLab",
+  "description": "CodeLab: Chemical code forensics, chromatography timeline tracking, multi-reagent rubric evaluation, and transparent hackathon synthesis.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
