@@ -34,6 +34,7 @@ export const SubmissionPage: React.FC = () => {
   // Form State
   const [provider, setProvider] = useState<RepoProvider>('github');
   const [repoUrl, setRepoUrl] = useState('');
+  const [liveProjectUrl, setLiveProjectUrl] = useState('');
   const [branch, setBranch] = useState('main');
   const [commitSha, setCommitSha] = useState('');
   const [autoLockEnabled, setAutoLockEnabled] = useState(true);
@@ -66,6 +67,7 @@ export const SubmissionPage: React.FC = () => {
             if (sub) {
               setSubmission(sub);
               setRepoUrl(sub.repoUrl);
+              setLiveProjectUrl(sub.liveProjectUrl || '');
               setCommitSha(sub.frozenCommitSha);
               setProvider(sub.provider);
             }
@@ -106,6 +108,7 @@ export const SubmissionPage: React.FC = () => {
         problemId: userTeam?.problemId || 'prob_ai',
         provider,
         repoUrl: repoUrl.trim(),
+        liveProjectUrl: liveProjectUrl.trim() || undefined,
         branch: branch.replace(' (protected)', ''),
         frozenCommitSha: commitSha,
         commitMessage: 'Sync: Complete video pipeline streaming service',
@@ -157,18 +160,18 @@ export const SubmissionPage: React.FC = () => {
         <div className="flex items-center justify-between">
           <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-surface-container-high text-primary font-mono text-[10px] uppercase tracking-wider border border-outline-variant/30">
             <Lock className="w-3.5 h-3.5" />
-            Submission Gate 04
+            Step 2 of 4
           </span>
           <span className="inline-flex items-center gap-1.5 font-mono text-[10px] text-secondary bg-surface-container-low px-2.5 py-0.5 rounded border border-outline-variant/20">
             <span className="w-1.5 h-1.5 rounded-full bg-secondary animate-ping" />
-            Repo Webhook Live
+            Analysis runs after submission
           </span>
         </div>
         <h1 className="text-2xl sm:text-3xl font-extrabold text-on-surface tracking-tight mt-1">
-          Repository Submission & Freeze
+          Submit your project
         </h1>
         <p className="text-xs sm:text-sm text-on-surface-variant">
-          Connect your Git repository. The SHA snapshot at the code freeze deadline will be cryptographically locked for evaluation.
+          Add your GitHub repository link and submit the project version for evaluation.
         </p>
       </div>
 
@@ -199,7 +202,7 @@ export const SubmissionPage: React.FC = () => {
             </div>
             <div>
               <div className="font-mono text-[10px] uppercase tracking-wider text-on-surface-variant font-semibold">
-                Code Freeze Deadline
+                Submission deadline
               </div>
               <div className="font-bold text-sm sm:text-base text-on-surface">
                 Today, 11:59 PM EST
@@ -220,7 +223,7 @@ export const SubmissionPage: React.FC = () => {
             <Lock className="w-4 h-4 text-secondary shrink-0" />
             <div className="min-w-0">
               <div className="font-medium text-xs text-on-surface truncate">
-                Automatic Snapshot Lock
+                Lock submitted version
               </div>
               <div className="font-mono text-[10px] text-on-surface-variant truncate">
                 Snapshot head commit at exactly 23:59:00
@@ -246,7 +249,7 @@ export const SubmissionPage: React.FC = () => {
       {/* Provider Selector */}
       <div className="flex flex-col space-y-2">
         <label className="font-mono text-[10px] uppercase tracking-wider text-on-surface-variant font-semibold">
-          Git Host Provider
+          Repository provider
         </label>
         <div className="grid grid-cols-3 gap-3">
           {/* GitHub (Active) */}
@@ -304,7 +307,7 @@ export const SubmissionPage: React.FC = () => {
         <div className="flex items-center justify-between pb-2 border-b border-outline-variant/20">
           <div className="flex items-center gap-2">
             <Terminal className="w-4 h-4 text-primary" />
-            <span className="font-bold text-sm text-on-surface">Target Reference</span>
+            <span className="font-bold text-sm text-on-surface">Project links</span>
           </div>
           <span className="font-mono text-[11px] text-on-surface-variant">Team: {userTeam?.name || 'ByteCrafters'}</span>
         </div>
@@ -312,7 +315,7 @@ export const SubmissionPage: React.FC = () => {
         {/* Remote URL */}
         <div className="flex flex-col space-y-1">
           <div className="flex items-center justify-between">
-            <label className="font-mono text-[10px] text-on-surface-variant uppercase">Remote URL</label>
+            <label className="font-mono text-[10px] text-on-surface-variant uppercase">GitHub repository link</label>
             <span className="inline-flex items-center gap-1 font-mono text-[10px] text-secondary bg-surface-container px-2 py-0.5 rounded border border-outline-variant/20">
               <CheckCircle2 className="w-3 h-3 text-secondary" />
               Verified by GitHub App
@@ -335,6 +338,17 @@ export const SubmissionPage: React.FC = () => {
               <span>{copiedUrl ? 'Copied' : 'Copy'}</span>
             </button>
           </div>
+        </div>
+
+        <div className="flex flex-col space-y-1">
+          <label className="font-mono text-[10px] text-on-surface-variant uppercase">Live project link</label>
+          <input
+            type="url"
+            value={liveProjectUrl}
+            onChange={(e) => setLiveProjectUrl(e.target.value)}
+            placeholder="https://your-project.example"
+            className="w-full bg-surface-container-lowest text-on-surface font-mono text-xs rounded-xl px-3 py-2.5 focus:outline-none border border-outline-variant/30"
+          />
         </div>
 
         {/* Branch Selector and SHA Grid */}

@@ -49,13 +49,14 @@ export const Navbar: React.FC = () => {
 
             <div className="h-3.5 w-px bg-stone-200 flex-shrink-0 hidden sm:block"></div>
 
-            <Link
-              to="/events"
-              className="clay-pill hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 bg-yellow-50 text-amber-900 text-[11px] font-semibold border border-yellow-200/70 hover:bg-yellow-100 transition-colors"
-            >
-              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse flex-shrink-0"></span>
-              <span className="truncate">Hackathons</span>
-            </Link>
+            {!user && (
+              <Link
+                to="/login"
+                className="clay-pill hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 bg-yellow-50 text-amber-900 text-[11px] font-semibold border border-yellow-200/70 hover:bg-yellow-100 transition-colors"
+              >
+                <span className="truncate">Sign in</span>
+              </Link>
+            )}
 
             {role === 'superadmin' && (
               <span className="clay-pill px-2 py-0.5 bg-orange-50 text-orange-800 text-[10px] font-bold uppercase hidden md:inline border border-orange-200">
@@ -76,61 +77,20 @@ export const Navbar: React.FC = () => {
 
           {/* Desktop Nav Links */}
           <div className="hidden md:flex items-center gap-1 text-xs font-semibold">
-            <Link
-              to="/events"
-              className={`px-3 py-1.5 rounded-xl transition-all ${
-                location.pathname.startsWith('/events')
-                  ? 'clay-pill bg-green-50 text-green-800 border border-green-200 shadow-sm font-bold'
-                  : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100/70'
-              }`}
-            >
-              Events
-            </Link>
-            <Link
-              to="/leaderboard"
-              className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
-                location.pathname === '/leaderboard'
-                  ? 'clay-pill bg-yellow-50 text-amber-900 border border-yellow-200 shadow-sm font-bold'
-                  : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100/70'
-              }`}
-            >
-              <span className="material-symbols-outlined text-[15px] text-amber-600">military_tech</span>
-              Leaderboards
-            </Link>
-
-            {user && (
-              <div className="flex items-center gap-1.5 ml-2 pl-2 border-l border-stone-200">
-                <Link
-                  to="/app/dashboard"
-                  className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-                    location.pathname.startsWith('/app')
-                      ? 'bg-green-700 text-white shadow-sm'
-                      : 'text-stone-600 hover:text-stone-900 hover:bg-green-50'
-                  }`}
-                >
-                  Participant
-                </Link>
-                <Link
-                  to="/admin/judging"
-                  className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-                    location.pathname.startsWith('/admin')
-                      ? 'bg-amber-600 text-white shadow-sm'
-                      : 'text-stone-600 hover:text-stone-900 hover:bg-yellow-50'
-                  }`}
-                >
-                  Judge
-                </Link>
-                <Link
-                  to="/superadmin/dashboard"
-                  className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-                    location.pathname.startsWith('/superadmin')
-                      ? 'bg-orange-600 text-white shadow-sm'
-                      : 'text-stone-600 hover:text-stone-900 hover:bg-orange-50'
-                  }`}
-                >
-                  Root
-                </Link>
-              </div>
+            {user && role === 'participant' ? (
+              <>
+                <Link to="/app/problems" className={`px-3 py-1.5 rounded-xl transition-all ${location.pathname === '/app/problems' ? 'bg-green-700 text-white shadow-sm font-bold' : 'text-stone-600 hover:text-stone-900 hover:bg-green-50'}`}>Hackathon Questions</Link>
+                <Link to="/app/submissions" className={`px-3 py-1.5 rounded-xl transition-all ${location.pathname === '/app/submissions' ? 'bg-green-700 text-white shadow-sm font-bold' : 'text-stone-600 hover:text-stone-900 hover:bg-green-50'}`}>Submit Project</Link>
+                <Link to="/app/results" className={`px-3 py-1.5 rounded-xl transition-all ${location.pathname === '/app/results' ? 'bg-green-700 text-white shadow-sm font-bold' : 'text-stone-600 hover:text-stone-900 hover:bg-green-50'}`}>My Marks</Link>
+                <Link to="/leaderboard" className={`px-3 py-1.5 rounded-xl transition-all ${location.pathname === '/leaderboard' ? 'bg-green-700 text-white shadow-sm font-bold' : 'text-stone-600 hover:text-stone-900 hover:bg-green-50'}`}>Leaderboard</Link>
+              </>
+            ) : (
+              <>
+                <Link to="/events" className={`px-3 py-1.5 rounded-xl transition-all ${location.pathname.startsWith('/events') ? 'clay-pill bg-green-50 text-green-800 border border-green-200 shadow-sm font-bold' : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100/70'}`}>Events</Link>
+                <Link to="/leaderboard" className={`px-3 py-1.5 rounded-xl transition-all ${location.pathname === '/leaderboard' ? 'clay-pill bg-yellow-50 text-amber-900 border border-yellow-200 shadow-sm font-bold' : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100/70'}`}>Leaderboard</Link>
+                {role === 'admin' && <Link to="/admin/judging" className="px-3 py-1.5 rounded-xl text-stone-600 hover:text-stone-900 hover:bg-yellow-50">Judging</Link>}
+                {role === 'superadmin' && <Link to="/superadmin/dashboard" className="px-3 py-1.5 rounded-xl text-stone-600 hover:text-stone-900 hover:bg-orange-50">Admin</Link>}
+              </>
             )}
           </div>
 
@@ -197,31 +157,31 @@ export const Navbar: React.FC = () => {
 
                     <div className="flex flex-col gap-0.5 mt-1">
                       <Link
-                        to="/app/dashboard"
+                        to={role === 'participant' ? '/app/problems' : '/app/dashboard'}
                         onClick={() => setProfileDropdownOpen(false)}
                         className="flex items-center gap-2 px-3 py-2 text-stone-700 hover:bg-green-50 rounded-xl transition-colors min-h-[40px]"
                       >
                         <span className="material-symbols-outlined text-[16px] text-green-700">dashboard</span>
-                        Dashboard
+                        {role === 'participant' ? 'Hackathon flow' : 'Dashboard'}
                       </Link>
 
-                      <Link
+                      {role !== 'participant' && <Link
                         to="/admin/judging"
                         onClick={() => setProfileDropdownOpen(false)}
                         className="flex items-center gap-2 px-3 py-2 text-stone-700 hover:bg-yellow-50 rounded-xl transition-colors min-h-[40px]"
                       >
                         <span className="material-symbols-outlined text-[16px] text-amber-700">science</span>
                         Judging Queue
-                      </Link>
+                      </Link>}
 
-                      <Link
+                      {role === 'superadmin' && <Link
                         to="/superadmin/dashboard"
                         onClick={() => setProfileDropdownOpen(false)}
                         className="flex items-center gap-2 px-3 py-2 text-stone-700 hover:bg-orange-50 rounded-xl transition-colors min-h-[40px]"
                       >
                         <span className="material-symbols-outlined text-[16px] text-orange-700">biotech</span>
                         Lab Director Console
-                      </Link>
+                      </Link>}
 
                       <div className="border-t border-stone-100 my-1" />
 
@@ -243,7 +203,7 @@ export const Navbar: React.FC = () => {
             ) : (
               <div className="flex items-center gap-1.5">
                 <Link
-                  to="/"
+                  to="/login"
                   className="clay-btn-google px-3 py-1.5 sm:px-3.5 sm:py-2 text-xs font-semibold flex items-center gap-1.5 min-h-[40px]"
                 >
                   <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24">
@@ -266,7 +226,7 @@ export const Navbar: React.FC = () => {
       {/* Mobile Bottom Navigation Dock */}
       <nav className="fixed bottom-0 inset-x-0 z-40 md:hidden pb-safe bg-white/95 backdrop-blur-md border-t border-stone-200/80 shadow-[0_-4px_16px_rgba(120,113,108,0.08)]">
         <div className="flex justify-around items-center h-15 px-1 max-w-md mx-auto">
-          {role === 'superadmin' ? (
+          {!user ? null : role === 'superadmin' ? (
             <>
               <Link
                 to="/superadmin/dashboard"
@@ -363,26 +323,15 @@ export const Navbar: React.FC = () => {
           ) : (
             <>
               <Link
-                to="/app/dashboard"
+                to="/app/problems"
                 className={`flex flex-col items-center justify-center min-w-[56px] h-12 transition-colors ${
-                  location.pathname === '/app/dashboard'
+                  location.pathname === '/app/problems'
                     ? 'text-green-700 font-bold'
                     : 'text-stone-500 hover:text-stone-900'
                 }`}
               >
-                <span className="material-symbols-outlined text-[20px]">dashboard</span>
-                <span className="text-[10px]">Dashboard</span>
-              </Link>
-              <Link
-                to="/app/teams"
-                className={`flex flex-col items-center justify-center min-w-[56px] h-12 transition-colors ${
-                  location.pathname === '/app/teams'
-                    ? 'text-green-700 font-bold'
-                    : 'text-stone-500 hover:text-stone-900'
-                }`}
-              >
-                <span className="material-symbols-outlined text-[20px]">group</span>
-                <span className="text-[10px]">Team</span>
+                <span className="material-symbols-outlined text-[20px]">quiz</span>
+                <span className="text-[10px]">Questions</span>
               </Link>
               <Link
                 to="/app/submissions"
@@ -396,6 +345,17 @@ export const Navbar: React.FC = () => {
                 <span className="text-[10px]">Submit</span>
               </Link>
               <Link
+                to="/app/results"
+                className={`flex flex-col items-center justify-center min-w-[56px] h-12 transition-colors ${
+                  location.pathname === '/app/results'
+                    ? 'text-green-700 font-bold'
+                    : 'text-stone-500 hover:text-stone-900'
+                }`}
+              >
+                <span className="material-symbols-outlined text-[20px]">grade</span>
+                <span className="text-[10px]">My Marks</span>
+              </Link>
+              <Link
                 to="/leaderboard"
                 className={`flex flex-col items-center justify-center min-w-[56px] h-12 transition-colors ${
                   location.pathname === '/leaderboard'
@@ -404,7 +364,7 @@ export const Navbar: React.FC = () => {
                 }`}
               >
                 <span className="material-symbols-outlined text-[20px]">military_tech</span>
-                <span className="text-[10px]">Standings</span>
+                <span className="text-[10px]">Leaderboard</span>
               </Link>
             </>
           )}

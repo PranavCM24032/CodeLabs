@@ -101,6 +101,7 @@ export interface Submission {
   problemId?: string;
   provider: RepoProvider;
   repoUrl: string;
+  liveProjectUrl?: string;
   branch: string;
   frozenCommitSha: string;
   commitMessage: string;

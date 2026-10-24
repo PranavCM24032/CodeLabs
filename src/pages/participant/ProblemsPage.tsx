@@ -135,13 +135,13 @@ export const ProblemsPage: React.FC = () => {
         <div>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-300 font-mono text-[11px] font-bold mb-2 shadow-xs">
             <FlaskConical className="w-3.5 h-3.5 text-amber-700" />
-            <span>codeLab Challenge Tracks</span>
+            <span>Hackathon</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-black text-stone-900 tracking-tight">
-            Research Problem Statements & Tracks
+            Hackathon Questions
           </h1>
           <p className="text-xs sm:text-sm text-stone-600 mt-1">
-            Claim an active challenge track for your team before the code freeze.
+            Read the questions and choose the one your team will build.
           </p>
         </div>
 
@@ -185,13 +185,13 @@ export const ProblemsPage: React.FC = () => {
         <div className="clay-card-yellow p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs">
           <div className="flex items-center gap-2.5 text-amber-950 font-semibold">
             <AlertCircle className="w-5 h-5 text-amber-700 shrink-0" />
-            <span>You must register or join a team before claiming a track.</span>
+            <span>Join a team before selecting a question.</span>
           </div>
           <Link
             to="/app/teams"
             className="clay-btn-orange px-4 py-2 rounded-xl text-xs font-bold shrink-0"
           >
-            Form Team
+            Manage team
           </Link>
         </div>
       )}
@@ -228,7 +228,7 @@ export const ProblemsPage: React.FC = () => {
                 <p className="text-xs text-stone-600 leading-relaxed mb-4">{prob.summary}</p>
 
                 <div className="p-3 rounded-xl bg-stone-100/90 border border-stone-200 mb-4 text-xs text-stone-700">
-                  <div className="font-bold text-stone-800 mb-1 text-[11px]">Assay Scope & Benchmarks:</div>
+                  <div className="font-bold text-stone-800 mb-1 text-[11px]">What to build</div>
                   <p className="line-clamp-3 text-stone-600 text-[11px] leading-relaxed">
                     {prob.description}
                   </p>
@@ -237,7 +237,7 @@ export const ProblemsPage: React.FC = () => {
 
               <div>
                 <div className="flex justify-between items-center text-xs text-stone-600 mb-4 border-t border-stone-200 pt-3 font-semibold">
-                  <span>Squad Allocation:</span>
+                  <span>Teams:</span>
                   <span className="font-mono text-stone-900 font-bold">
                     {prob.currentCount} / {prob.maxCapacity} Claimed
                   </span>
@@ -246,7 +246,7 @@ export const ProblemsPage: React.FC = () => {
                 {isSelectedByTeam ? (
                   <div className="w-full py-2.5 rounded-2xl bg-emerald-100 border border-emerald-300 text-emerald-800 font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs">
                     <CheckCircle2 className="w-4 h-4 text-emerald-700" />
-                    Claimed by Your Squad
+                    Selected for your team
                   </div>
                 ) : (
                   <button
@@ -255,12 +255,12 @@ export const ProblemsPage: React.FC = () => {
                     className="w-full py-2.5 rounded-2xl clay-btn-primary text-xs font-bold flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {selectingId === prob.id ? (
-                      'Securing Track...'
+                      'Saving...'
                     ) : isFull ? (
                       'Capacity Full'
                     ) : (
                       <>
-                        Claim This Research Track <ArrowRight className="w-3.5 h-3.5" />
+                        Choose this question <ArrowRight className="w-3.5 h-3.5" />
                       </>
                     )}
                   </button>

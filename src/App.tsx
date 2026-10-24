@@ -5,7 +5,6 @@ import { Navbar } from './components/common/Navbar';
 import { ProtectedRoute } from './components/common/ProtectedRoute';
 
 // Public Pages
-import { LandingPage } from './pages/public/LandingPage';
 import { EventsDirectory } from './pages/public/EventsDirectory';
 import { PublicLeaderboardPage } from './pages/public/PublicLeaderboard';
 import { LoginPage } from './pages/public/LoginPage';
@@ -44,7 +43,7 @@ export default function App() {
           <main className="flex-1">
             <Routes>
               {/* Public Routes */}
-              <Route path="/" element={<LandingPage />} />
+              <Route path="/" element={<Navigate to="/login" replace />} />
               <Route path="/events" element={<EventsDirectory />} />
               <Route path="/events/:eventId" element={<EventsDirectory />} />
               <Route path="/leaderboard" element={<PublicLeaderboardPage />} />

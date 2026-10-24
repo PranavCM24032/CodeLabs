@@ -30,7 +30,7 @@ export const LoginPage: React.FC = () => {
     setLoading(true);
     try {
       await signInWithGoogle();
-      navigate('/app/dashboard');
+      navigate('/app/problems');
     } catch (err: any) {
       setError(err.message || 'Google authentication was cancelled.');
     } finally {
@@ -45,7 +45,7 @@ export const LoginPage: React.FC = () => {
     try {
       await signInWithEmail(email, password);
       const isOwner = email.toLowerCase() === OWNER_EMAIL.toLowerCase();
-      navigate(isOwner ? '/superadmin/dashboard' : '/app/dashboard');
+      navigate(isOwner ? '/superadmin/dashboard' : '/app/problems');
     } catch (err: any) {
       setError(err.message || 'Invalid credentials.');
     } finally {
@@ -75,13 +75,13 @@ export const LoginPage: React.FC = () => {
           </div>
 
           <span className="font-mono text-xs font-black uppercase tracking-widest text-stone-600 mb-1">
-            BAUHAUS // FORM FOLLOWS FUNCTION
+            HACKATHON PORTAL
           </span>
           <h1 className="text-2xl sm:text-3xl font-black text-stone-900 uppercase tracking-tight">
-            codeLab Gateway
+            Sign in to continue
           </h1>
           <p className="text-xs text-stone-600 max-w-[320px] mt-1 text-center font-medium">
-            Sign in to access your hackathon dashboard, teams, and submissions.
+            Use your approved account to access the hackathon.
           </p>
         </div>
 
@@ -107,13 +107,13 @@ export const LoginPage: React.FC = () => {
               <path d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.8s.2-2.1.4-2.8L1.9 6.3C.7 8.7 0 10.3 0 12s.7 3.3 1.9 5.7l3.7-2.9z" fill="#FBBC05" />
               <path d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.3-6.4-5.2L1.9 16c1.8 3.7 5.6 7 10.1 7z" fill="#34A853" />
             </svg>
-            <span>{loading ? 'Synthesizing...' : 'Continue with Google'}</span>
+            <span>{loading ? 'Signing in...' : 'Continue with Google'}</span>
           </button>
 
           <div className="relative flex py-1 items-center">
             <div className="flex-grow border-t-2 border-stone-200" />
             <span className="flex-shrink mx-3 text-[11px] font-mono font-black uppercase text-stone-500">
-              OR EMAIL IDENTITY
+              OR USE EMAIL
             </span>
             <div className="flex-grow border-t-2 border-stone-200" />
           </div>
@@ -122,7 +122,7 @@ export const LoginPage: React.FC = () => {
           <form onSubmit={handleEmailSubmit} className="space-y-4">
             <div>
               <label className="block text-[11px] font-mono font-black uppercase text-stone-800 mb-1">
-                Lab Email Address
+                Email address
               </label>
               <div className="relative">
                 <Mail className="w-4 h-4 absolute left-3 top-3.5 text-stone-500" />
@@ -139,7 +139,7 @@ export const LoginPage: React.FC = () => {
 
             <div>
               <label className="block text-[11px] font-mono font-black uppercase text-stone-800 mb-1">
-                Authorization Key
+                Password
               </label>
               <div className="relative">
                 <Key className="w-4 h-4 absolute left-3 top-3.5 text-stone-500" />
@@ -167,7 +167,7 @@ export const LoginPage: React.FC = () => {
               disabled={loading}
               className="clay-btn-primary w-full min-h-[48px] py-3 px-4 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 border-2 border-stone-900"
             >
-              <span>{loading ? 'Synthesizing...' : 'Authorize Clearance'}</span>
+              <span>{loading ? 'Signing in...' : 'Sign in'}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>

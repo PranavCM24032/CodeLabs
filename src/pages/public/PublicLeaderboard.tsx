@@ -88,11 +88,11 @@ export const PublicLeaderboardPage: React.FC = () => {
             <div className="flex items-center gap-2">
               <div className="w-3.5 h-3.5 rounded-full bg-amber-500 border border-stone-900" />
               <span className="font-mono text-xs font-black uppercase tracking-widest text-stone-900">
-                STANDINGS // OFFICIAL LEADERBOARD
+                HACKATHON LEADERBOARD
               </span>
             </div>
             <span className="font-mono text-xs font-black px-2.5 py-1 bg-white border-2 border-stone-900 rounded-full text-stone-900">
-              SEALED MANIFEST
+              LIVE RANKINGS
             </span>
           </div>
 
@@ -102,7 +102,7 @@ export const PublicLeaderboardPage: React.FC = () => {
                 InterCollege HackGrid 2025
               </h1>
               <p className="text-xs sm:text-sm text-stone-700 font-medium font-mono mt-1">
-                Official standings normalized across rubric evaluations. Verified rankings.
+                Final rankings for the hackathon.
               </p>
             </div>
 
@@ -112,7 +112,7 @@ export const PublicLeaderboardPage: React.FC = () => {
               className="clay-btn-orange min-h-[44px] px-5 py-2.5 text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 border-2 border-stone-900 cursor-pointer self-start sm:self-auto"
             >
               <Download className="w-4 h-4" />
-              <span>{exporting ? 'Exporting...' : 'Export CSV Ledger'}</span>
+              <span>{exporting ? 'Exporting...' : 'Export CSV'}</span>
             </button>
           </div>
         </section>
