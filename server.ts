@@ -23,11 +23,7 @@ app.get('/api/health', (_req: Request, res: Response) => {
   });
 });
 
-// Run Domain Tests
-app.get('/api/tests/run', async (_req: Request, res: Response) => {
   try {
-    const { runCriticalDomainInvariantsTest } = await import('./src/tests/domain.test.ts');
-    const results = runCriticalDomainInvariantsTest();
     res.json({ success: true, timestamp: new Date().toISOString(), results });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
