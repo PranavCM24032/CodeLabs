@@ -139,7 +139,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await setDoc(adminRef, { uid: user.uid, email: user.email, role: 'superadmin', grantedAt: new Date().toISOString(), grantedBy: 'owner_bootstrap_action' });
       if (profile) setProfile({ ...profile, role: 'superadmin' });
       return true;
-    } catch (err) { handleFirestoreError(err, OperationType.WRITE, dmins/); return false; }
+    } catch (err) { handleFirestoreError(err, OperationType.WRITE, 'admins/' + user.uid); return false; }
   };
 
   const refreshProfile = async () => { if (user) await loadUserProfile(user); };

@@ -288,7 +288,7 @@ export const Navbar: React.FC = () => {
                 }`}
               >
                 <span className="material-symbols-outlined text-[20px]">schema</span>
-                <span className="text-[10px]">Reagents</span>
+                <span className="text-[10px]">Rubrics</span>
               </Link>
               <Link
                 to="/superadmin/scoring"
@@ -393,7 +393,7 @@ export const Navbar: React.FC = () => {
                 }`}
               >
                 <span className="material-symbols-outlined text-[20px]">deployed_code_history</span>
-                <span className="text-[10px]">Specimen</span>
+                <span className="text-[10px]">Submit</span>
               </Link>
               <Link
                 to="/leaderboard"

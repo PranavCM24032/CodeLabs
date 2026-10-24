@@ -70,7 +70,7 @@ export const JudgingQueuePage: React.FC = () => {
     return {
       id: team.id,
       name: team.name,
-      problemStatement: team.problemId || 'General Track Specimen',
+      problemStatement: team.problemId || 'General Track',
       code: team.code,
       status,
       sha: sub?.frozenCommitSha ? sub.frozenCommitSha.slice(0, 7) : 'Not frozen',
@@ -123,7 +123,7 @@ export const JudgingQueuePage: React.FC = () => {
         <div className="mt-5 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
             <h1 className="text-2xl sm:text-3xl font-black text-stone-900 tracking-tight">
-              Specimen Judging &amp; Multi-Reagent Assays
+              Team Evaluation &amp; Scoring
             </h1>
             <p className="text-xs sm:text-sm text-stone-700 mt-1 max-w-xl leading-relaxed">
               Examine sealed commit SHAs, record criterion-level rubric scores, and publish verified certificates.
@@ -211,7 +211,7 @@ export const JudgingQueuePage: React.FC = () => {
           <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none" />
           <input
             type="text"
-            placeholder="Search specimen team, challenge code, or track..."
+            placeholder="Search team, challenge code, or track..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="clay-input pl-10"
@@ -279,7 +279,7 @@ export const JudgingQueuePage: React.FC = () => {
                     : 'clay-btn-primary'
                 }`}
               >
-                <span>{item.status === 'completed' ? 'Re-inspect Score' : 'Open Assay Form'}</span>
+                <span>{item.status === 'completed' ? 'Re-inspect Score' : 'Open Evaluation Form'}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
@@ -289,7 +289,7 @@ export const JudgingQueuePage: React.FC = () => {
         {filteredItems.length === 0 && (
           <div className="clay-card p-12 text-center text-stone-500 font-semibold text-xs">
             {teams.length === 0
-              ? 'No specimen squads enrolled in this hackathon yet.'
+              ? 'No teams enrolled in this hackathon yet.'
               : 'No squads match the current filter or search criteria.'}
           </div>
         )}

@@ -149,7 +149,7 @@ export const SuperadminDashboard: React.FC = () => {
         {/* KPI 4: Standings & Leaderboard Gate */}
         <div className="clay-card-yellow p-5">
           <div className="flex justify-between items-center text-xs font-bold text-amber-900 mb-1">
-            <span>Synthesis Release Gate</span>
+            <span>Leaderboard Release Gate</span>
             <span className="p-2 rounded-xl bg-amber-200 text-amber-900 border border-amber-300">
               <Award className="w-4 h-4" />
             </span>
@@ -174,7 +174,7 @@ export const SuperadminDashboard: React.FC = () => {
               <Award className="w-6 h-6" />
             </div>
             <h3 className="text-base font-black text-stone-900 group-hover:text-amber-800 transition-colors">
-              Scoring Synthesis & Release
+              Scoring & Leaderboard Release
             </h3>
             <p className="text-xs text-stone-600 mt-1.5 leading-relaxed">
               Review rubric aggregate calculations, toggle public leaderboard visibility, and export verified medal standings.

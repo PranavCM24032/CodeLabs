@@ -69,7 +69,7 @@ export const ProblemsPage: React.FC = () => {
     if (userTeam.leaderId !== user.uid) {
       setActionMessage({
         type: 'error',
-        text: 'Only the specimen squad leader can select or alter challenge tracks.',
+        text: 'Only the team leader can select or alter challenge tracks.',
       });
       return;
     }
@@ -103,7 +103,7 @@ export const ProblemsPage: React.FC = () => {
 
       setActionMessage({
         type: 'success',
-        text: `Specimen squad "${userTeam.name}" successfully claimed track "${problem.title}"!`,
+        text: `Team "${userTeam.name}" successfully claimed track "${problem.title}"!`,
       });
     } catch (err: any) {
       setActionMessage({ type: 'error', text: err.message || 'Failed to claim challenge track.' });
@@ -123,7 +123,7 @@ export const ProblemsPage: React.FC = () => {
     return (
       <div className="max-w-7xl mx-auto px-4 py-16 text-center text-stone-600">
         <div className="w-10 h-10 border-4 border-amber-500/20 border-t-emerald-600 rounded-full animate-spin mx-auto mb-3" />
-        <p className="text-xs font-semibold text-stone-700">Loading codeLab challenge tracks & specimen specs...</p>
+        <p className="text-xs font-semibold text-stone-700">Loading codeLab challenge tracks & specs...</p>
       </div>
     );
   }
@@ -135,13 +135,13 @@ export const ProblemsPage: React.FC = () => {
         <div>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-300 font-mono text-[11px] font-bold mb-2 shadow-xs">
             <FlaskConical className="w-3.5 h-3.5 text-amber-700" />
-            <span>codeLab Specimen Challenges</span>
+            <span>codeLab Challenge Tracks</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-black text-stone-900 tracking-tight">
             Research Problem Statements & Tracks
           </h1>
           <p className="text-xs sm:text-sm text-stone-600 mt-1">
-            Claim an active challenge track for your laboratory squad before the catalytic code freeze.
+            Claim an active challenge track for your team before the code freeze.
           </p>
         </div>
 
@@ -185,13 +185,13 @@ export const ProblemsPage: React.FC = () => {
         <div className="clay-card-yellow p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs">
           <div className="flex items-center gap-2.5 text-amber-950 font-semibold">
             <AlertCircle className="w-5 h-5 text-amber-700 shrink-0" />
-            <span>You must register or join a laboratory squad before claiming a research track.</span>
+            <span>You must register or join a team before claiming a track.</span>
           </div>
           <Link
             to="/app/teams"
             className="clay-btn-orange px-4 py-2 rounded-xl text-xs font-bold shrink-0"
           >
-            Form Specimen Squad
+            Form Team
           </Link>
         </div>
       )}

@@ -1,4 +1,4 @@
-﻿export interface StaffUser {
+export interface StaffUser {
   email: string;
   name: string;
   role: 'superadmin' | 'admin';
@@ -29,7 +29,7 @@ export async function fetchAllowedUsers(): Promise<AllowedUsers> {
 
 export async function checkAccess(email: string): Promise<{ allowed: boolean; type?: 'staff' | 'participant'; user?: any }> {
   try {
-    const res = await fetch(/api/auth/check-access?email= + encodeURIComponent(email));
+    const res = await fetch('/api/auth/check-access?email=' + encodeURIComponent(email));
     if (res.ok) {
       return await res.json();
     }

@@ -112,9 +112,9 @@ export const PlatformSettingsPage: React.FC = () => {
 
         {/* Git Providers Setup Guidelines */}
         <div className="clay-card-orange p-6 sm:p-8 text-xs">
-          <h2 className="text-base font-black text-stone-900 mb-2">Specimen Repository Credentials</h2>
+          <h2 className="text-base font-black text-stone-900 mb-2">Git Repository Credentials</h2>
           <p className="text-stone-700 leading-relaxed mb-4">
-            codeLab inspects public git specimens out-of-the-box. To lift GitHub rate limits for high-volume hackathon events, set a personal access token in your environment:
+            codeLab inspects public git repositories out-of-the-box. To lift GitHub rate limits for high-volume hackathon events, set a personal access token in your environment:
           </p>
           <div className="p-3.5 rounded-xl bg-orange-100/90 font-mono text-orange-950 border border-orange-200 font-bold">
             GITHUB_TOKEN="ghp_yourPersonalAccessTokenHere"

@@ -184,14 +184,14 @@ export const AdminDashboard: React.FC = () => {
               <BarChart2 className="w-6 h-6" />
             </div>
             <h3 className="text-base font-black text-stone-900 group-hover:text-emerald-800 transition-colors">
-              Synthesis Standings & Export
+              Evaluation Standings & Export
             </h3>
             <p className="text-xs text-stone-600 mt-1.5 leading-relaxed">
               Track evaluation progress percentages, inspect normal score curves, and download verified CSV ledgers.
             </p>
           </div>
           <div className="mt-5 flex items-center gap-1.5 text-xs font-bold text-emerald-800">
-            <span>Generate Lab Reports</span>
+            <span>Generate Reports</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </div>
         </Link>

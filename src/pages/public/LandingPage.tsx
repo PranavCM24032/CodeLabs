@@ -471,7 +471,7 @@ export const LandingPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Step 3: Rectangle (Catalytic Orange) */}
+            {/* Step 3: Rectangle (Accent Orange) */}
             <div className="clay-card-orange p-6 flex flex-col justify-between gap-4 border-2 border-stone-900">
               <div>
                 <div className="flex items-center justify-between mb-4">

@@ -1,1 +1,125 @@
-# CodeLab — Hackathon Management & Repository Intelligence Platform**"Every Commit Tells a Story."**CodeLab is a production-grade multi-user hackathon management, repository s, code similarity analysis, dynamic rubric evaluation, scoring, and leaderboard platform built with **React**, **TypeScript**, **Tailwind CSS**, **Express**, and **Google Cloud Firestore**.---## 1. Project Overview & ArchitectureCodeLab manages the complete lifecycle of competitive hackathons:- **Public Discovery**: Hackathon directory, eligibility criteria, challenge track details, and real-time public leaderboards.- **Participant Experience**: Team formation with unique 6-character invite codes, capacity limit enforcement, track claim, repository submission with live commit SHA snapshot freezing.- **Admin & Judge Workspace**: Assigned evaluation queue, dynamic rubric form rendering with bounds validation (0 to max marks), confidential judge notes, and repository s inspector.- **Repository s Subsystem**: Integration with GitHub, GitLab, and Bitbucket. Freezes exact commit SHAs at submission, preventing post-deadline modifications, detects late bulk uploads, and runs 3-gram token Jaccard distance code similarity analysis.- **Dynamic Evaluation Schema Builder**: Visual editor for Superadmins to create, reorder, version, and publish evaluation rubrics (numeric, rubric levels, dropdowns, comments) without altering application code.- **Score Aggregation & Leaderboard Engine**: Multi-judge median/average aggregation, tie-break sequences, audited mark overrides with mandatory reasons, and one-click public leaderboard publishing with CSV export.- **Security & RBAC**: Strict separation of three roles: `participant`, `admin` (also judge), and `superadmin`. Client-side privilege escalation is mathematically blocked via deployed Firestore Security Rules and server-side verification.---## 2. Mandatory Tech Stack- **Frontend**: React 19, TypeScript, Vite, React Router 7, Tailwind CSS, Lucide icons.- **Backend**: Express on Node.js (`server.ts`) with Vite middleware in development.- **Database & Auth**: Google Cloud Firestore & Firebase Authentication (`firebase-applet-config.json`).- **Security**: Hardened Firestore Security Rules (`firestore.rules`) deployed via Firebase fax RPC.---## 3. User Role Model & Permissions| Capability | Participant | Admin (Judge) | Superadmin || :--- | :---: | :---: | :---: || Browse public events & leaderboards | Yes | Yes | Yes || Register & form/join teams | Yes | Yes | Yes || Select challenge tracks & submit Git repo | Yes | Yes | Yes || View own released marks & approved feedback | Yes | Yes | Yes || View assigned judging queue & teams | No | Yes | Yes || Evaluate teams using dynamic rubrics | No | Yes | Yes || Inspect commit timeline & code similarity findings | No | Yes | Yes || Mark similarity findings (under review / dismissed / etc.) | No | Yes | Yes || Create / edit / archive events & rounds | No | No | Yes || Grant / revoke Admin roles to users | No | No | Yes || Suspend / reactivate user accounts | No | No | Yes || Build, version, and publish dynamic rubric schemas | No | No | Yes || Execute audited mark overrides | No | No | Yes || Publish official leaderboard to public portal | No | Authorized | Yes || Access governance & security audit logs | No | No | Yes |---## 4. Superadmin Provisioning ProcedureThe platform owner email is pre-configured as:```pranavpaunikar.ml24@sbjit.edu.in```When this email signs in (via Google or Email), the system:1. Recognizes the account as the authoritative platform owner.2. Automatically provisions the user document in `/users/{uid}` with role `superadmin`.3. Creates the security index record in `/admins/{uid}`.4. Allows immediate access to `/superadmin/dashboard`.Normal public registrations via `/register` are strictly locked to `participant` role by Firestore rules.---## 5. Development & Running### Prerequisites- Node.js 20+- npm or bun### Commands- Start dev server (full-stack with Vite & Express):  ```bash  npm run dev  ```  Runs at `http://localhost:3000`.- Build production bundle:  ```bash  npm run build  ```- TypeScript verification / Lint:  ```bash  npm run lint  ```- Run Domain Invariant Tests:  ```bash  curl http://localhost:3000/api/tests/run  ```---## 6. Repository Providers ConfigurationCodeLab includes server-side repository s at `/api/repo/inspect`:- **GitHub**: Public repositories are inspected automatically. For higher rate limits or organization repositories, set `GITHUB_TOKEN="ghp_xxx"` in your environment secrets.- **GitLab**: Queries project commits and resolves commit hash.- **Bitbucket**: Resolves commit hash and commit metadata.- **Commit SHA Freezing**: CodeLab records the exact commit hash at submission time and stores it in the submission document. Subsequent code changes on the branch do not affect the snapshot evaluated by judges.---## 7. Security Rules ArchitectureThe Firestore security rules in `firestore.rules` adhere to the 8 security pillars:1. Default-deny catch-all rule on all unmatched paths.2. `isOwner(userId)` checks on user documents.3. Fast `isAdmin()` / `isSuperadmin()` checks looking up `/admins/{userId}` and owner email.4. Public read on `/events` and `/events/{eventId}/leaderboard/published`.5. Write protection ensuring participants cannot elevate their own role or edit official evaluation scores.6. Immutable write-only governance audit log on `/auditLogs`.
+# ⚡ CodeLab — Hackathon Management & Evaluation Platform
+
+> **"Every Commit Tells a Story."**  
+> A production-grade multi-role platform for hackathon administration, team lifecycle, Git repository inspection, dynamic rubric evaluation, and real-time leaderboards.
+
+---
+
+## ⏱️ 10-Second Architecture TL;DR
+
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│                              CODELAB                                   │
+├────────────────────┬────────────────────┬──────────────────────────────┤
+│  PARTICIPANT       │  JUDGE / ADMIN     │  SUPERADMIN                  │
+│  • Team Formation  │  • Evaluation Form │  • Event Lifecycle           │
+│  • Track Selection │  • Rubric Scoring  │  • Dynamic Rubric Builder    │
+│  • Repo Submission │  • Queue Filter    │  • Score Release & Overrides │
+│  • SHA Freeze Lock │  • Reports & CSV   │  • User RBAC & Audit Logs    │
+└────────────────────┴────────────────────┴──────────────────────────────┘
+                         ▲
+                         │  (Firebase Auth + Firestore Rules)
+                         ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│  STACK: React 19 • TypeScript • Vite • Tailwind CSS • Express • Vercel  │
+└────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🚀 Quickstart (30 Seconds)
+
+### 1. Install & Run Locally
+```bash
+# Install dependencies
+npm install
+
+# Start local server (Runs fullstack Express + Vite on port 3000)
+npm run dev
+```
+Open **[http://localhost:3000](http://localhost:3000)** in your browser.
+
+### 2. Available Scripts
+| Command | Action |
+| :--- | :--- |
+| `npm run dev` | Starts Express backend (`server.ts`) with tsx runner |
+| `npm run build` | Builds Vite production bundle into `/dist` |
+| `npm run lint` | Runs TypeScript typechecker (`tsc --noEmit`) |
+| `npm run preview`| Previews the production build locally |
+
+---
+
+## 👥 Roles & Pre-Configured Accounts
+
+The system supports strict **Role-Based Access Control (RBAC)** across three tiers:
+
+| Role | Pre-Configured User | Source | Permissions |
+| :--- | :--- | :--- | :--- |
+| **Superadmin** | `pranavpaunikar.ml24@sbjit.edu.in` | Platform Owner / `staff-users.json` | Full governance, event creation, rubric schema builder, score release gate, user role management |
+| **Admin (Judge)**| `auron.sbjitmr@gmail.com` | `data/staff-users.json` | Access judging queue, fill dynamic rubric scores, review repo SHAs, export reports |
+| **Participant** | `paunikarpranav58@gmail.com` / New Users | `data/participants.json` / `/register` | Form/join teams (6-char code), claim track, submit Git repo, view released feedback |
+
+> **Note on Access Control**: The app reads allowed roles from `data/staff-users.json` and `data/participants.json` via `/api/auth/check-access`, backed by Firestore security rules.
+
+---
+
+## 📁 Project Directory Map
+
+```text
+codelabs/
+├── api/                       # Vercel serverless entry point
+│   └── index.ts               # Exports Express app from server.ts
+├── data/                      # Local role allowlists & seed records
+│   ├── staff-users.json       # Superadmins and Judges
+│   └── participants.json      # Registered participant list
+├── src/
+│   ├── components/            # Reusable components
+│   │   ├── common/            # Navbar, footer, protected route wrappers
+│   │   └── ui/                # Buttons, inputs, modals
+│   ├── context/
+│   │   └── AuthContext.tsx    # Firebase authentication & session state
+│   ├── pages/
+│   │   ├── public/            # LandingPage, EventsDirectory, PublicLeaderboard, Login, Register
+│   │   ├── participant/       # ParticipantDashboard, ProblemsPage, TeamsPage, SubmissionPage, Results
+│   │   ├── admin/             # AdminDashboard, JudgingQueue, EvaluationForm, AdminReports
+│   │   └── superadmin/        # SuperadminDashboard, UsersManagement, SchemaBuilder, Scoring, Settings
+│   ├── services/
+│   │   ├── firestoreService.ts# Typed Firestore CRUD, queries, and listeners
+│   │   └── authAllowlist.ts   # Backend role verification hook
+│   ├── types/                 # Shared TypeScript interfaces & models
+│   ├── App.tsx                # Client-side router & route protection
+│   └── main.tsx               # Application root
+├── server.ts                  # Express backend (API routes, similarity engine, CSV export)
+├── firestore.rules            # Cloud Firestore security rules
+├── vercel.json                # Vercel deployment & URL rewrites
+└── vite.config.ts             # Vite build configuration
+```
+
+---
+
+## 🌐 API Endpoints (`server.ts`)
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/api/health` | Healthcheck & server metadata |
+| `GET` | `/api/auth/allowed-users` | Returns list of configured staff and participants |
+| `GET` | `/api/auth/check-access?email=...` | Validates email role permissions before authentication |
+| `POST` | `/api/analysis/run-similarity` | 3-gram token Jaccard distance code similarity engine |
+| `ALL` | `/api/export/leaderboard-csv` | Generates verified CSV export of leaderboard standings |
+
+---
+
+## ☁️ Deployment (Vercel)
+
+The app is pre-configured for one-click deployment on **Vercel**:
+- **Build Command**: `npm run build`
+- **Output Directory**: `dist`
+- **Serverless API**: Handled via `api/index.ts` → `server.ts`
+- **Rewrites**: Configured in [`vercel.json`](file:///c:/codelabs/vercel.json) for client-side routing & `/api/*` endpoints.
+
+---
+
+## 🛡️ Security Highlights
+1. **Commit Freezing**: Captures and freezes the exact Git commit SHA at submission deadline to prevent post-deadline tampering.
+2. **Firestore Security Rules**: Role-based rules enforce that participants cannot edit evaluations or escalate roles.
+3. **Audit Trail**: Superadmin overrides and role updates are recorded with immutable SHA log entries.

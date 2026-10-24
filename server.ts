@@ -18,7 +18,7 @@ app.use(express.json({ limit: '10mb' }));
 app.get(['/api/health', '/health'], (_req: Request, res: Response) => {
   res.json({
     status: 'ok',
-    service: 'GitTrack Engine',
+    service: 'CodeLab Engine',
     timestamp: new Date().toISOString(),
     owner: 'pranavpaunikar.ml24@sbjit.edu.in',
   });
@@ -26,12 +26,10 @@ app.get(['/api/health', '/health'], (_req: Request, res: Response) => {
 
 // Helper to normalize and tokenize code for similarity analysis
 function tokenizeCode(code: string): string[] {
-  // Strip comments and normalize whitespace
   const stripped = code
     .replace(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*$/gm, '')
     .replace(/\s+/g, ' ')
     .trim();
-  // Simple tokenization by words, symbols, and operators
   return stripped.split(/([a-zA-Z0-9_]+|[^\s\w])/g).filter((t) => t.trim().length > 0);
 }
 
@@ -56,10 +54,10 @@ function calculateNgramSimilarity(tokensA: string[], tokensB: string[], n = 3): 
   return union === 0 ? 0 : Math.round((intersection / union) * 100);
 }
 
-// 2. SIMILARITY ANALYSIS ENGINE
+// Similarity Analysis Engine
 app.post(['/api/analysis/run-similarity', '/analysis/run-similarity'], (req: Request, res: Response) => {
   try {
-    const { submissionId, teamName, codeSampleA, codeSampleB, otherTeamName } = req.body;
+    const { submissionId, codeSampleA, codeSampleB, otherTeamName } = req.body;
 
     const sampleA = codeSampleA || '';
     const sampleB = codeSampleB || '';
@@ -114,7 +112,7 @@ app.post(['/api/analysis/run-similarity', '/analysis/run-similarity'], (req: Req
   }
 });
 
-// 3. AUTHORIZED CSV EXPORT (Supports GET and POST)
+// Authorized CSV Export
 app.all(['/api/export/leaderboard-csv', '/export/leaderboard-csv'], (req: Request, res: Response) => {
   try {
     const standings = req.body?.standings || [];
@@ -135,9 +133,60 @@ app.all(['/api/export/leaderboard-csv', '/export/leaderboard-csv'], (req: Reques
     res.setHeader('Content-Type', 'text/csv');
     res.setHeader(
       'Content-Disposition',
-      `attachment; filename="GitTrack_Leaderboard_${(eventTitle || 'Event').replace(/\s+/g, '_')}.csv"`
+      `attachment; filename="CodeLab_Leaderboard_${(eventTitle || 'Event').replace(/\s+/g, '_')}.csv"`
     );
     return res.send(csvContent);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// JSON-based user access control
+const DATA_DIR = path.resolve(__dirname, 'data');
+const STAFF_USERS_PATH = path.join(DATA_DIR, 'staff-users.json');
+const PARTICIPANTS_PATH = path.join(DATA_DIR, 'participants.json');
+
+function readJsonFile(filePath: string) {
+  try {
+    if (fs.existsSync(filePath)) {
+      const content = fs.readFileSync(filePath, 'utf8');
+      return JSON.parse(content);
+    }
+  } catch (e) {
+    console.error('Error reading JSON file:', e);
+  }
+  return [];
+}
+
+app.get('/api/auth/allowed-users', (_req: Request, res: Response) => {
+  try {
+    const staffUsers = readJsonFile(STAFF_USERS_PATH);
+    const participants = readJsonFile(PARTICIPANTS_PATH);
+    res.json({ staffUsers, participants });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/auth/check-access', (req: Request, res: Response) => {
+  try {
+    const email = ((req.query.email as string) || '').toLowerCase().trim();
+    if (!email) return res.status(400).json({ allowed: false, error: 'Email required' });
+
+    const staffUsers = readJsonFile(STAFF_USERS_PATH);
+    const participants = readJsonFile(PARTICIPANTS_PATH);
+
+    const staffUser = staffUsers.find((u: any) => (u.email || '').toLowerCase().trim() === email);
+    if (staffUser) {
+      return res.json({ allowed: true, type: 'staff', user: staffUser });
+    }
+
+    const participant = participants.find((p: any) => (p.email || '').toLowerCase().trim() === email);
+    if (participant) {
+      return res.json({ allowed: true, type: 'participant', user: participant });
+    }
+
+    res.json({ allowed: false });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
@@ -155,113 +204,8 @@ if (fs.existsSync(distPath)) {
 // Start listener for standalone/local environment (Vercel invokes exported handler)
 if (!process.env.VERCEL) {
   app.listen(PORT, '0.0.0.0', () => {
-    console.log(`GitTrack server running at http://localhost:${PORT}`);
+    console.log(`CodeLab server running at http://localhost:${PORT}`);
   });
 }
 
 export default app;
-
-
-// JSON-based user access control
-const DATA_DIR = path.resolve(__dirname, 'data');
-const STAFF_USERS_PATH = path.join(DATA_DIR, 'staff-users.json');
-const PARTICIPANTS_PATH = path.join(DATA_DIR, 'participants.json');
-
-function readJsonFile(filePath: string) {
-  try {
-    if (fs.existsSync(filePath)) {
-      const content = fs.readFileSync(filePath, 'utf8');
-      return JSON.parse(content);
-    }
-  } catch (e) {
-    console.error('Error reading JSON file:', e);
-  }
-  return [];
-}
-
-app.get('/api/auth/allowed-users', (req: Request, res: Response) => {
-  try {
-    const staffUsers = readJsonFile(STAFF_USERS_PATH);
-    const participants = readJsonFile(PARTICIPANTS_PATH);
-    res.json({ staffUsers, participants });
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-app.get('/api/auth/check-access', (req: Request, res: Response) => {
-  try {
-    const email = (req.query.email as string || '').toLowerCase();
-    if (!email) return res.status(400).json({ allowed: false, error: 'Email required' });
-    
-    const staffUsers = readJsonFile(STAFF_USERS_PATH);
-    const participants = readJsonFile(PARTICIPANTS_PATH);
-    
-    const staffUser = staffUsers.find((u: any) => (u.email || '').toLowerCase() === email);
-    if (staffUser) {
-      return res.json({ allowed: true, type: 'staff', user: staffUser });
-    }
-    
-    const participant = participants.find((p: any) => (p.email || '').toLowerCase() === email);
-    if (participant) {
-      return res.json({ allowed: true, type: 'participant', user: participant });
-    }
-    
-    res.json({ allowed: false });
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-
-// JSON-based user access control
-const DATA_DIR = path.resolve(__dirname, 'data');
-const STAFF_USERS_PATH = path.join(DATA_DIR, 'staff-users.json');
-const PARTICIPANTS_PATH = path.join(DATA_DIR, 'participants.json');
-
-function readJsonFile(filePath: string) {
-  try {
-    if (fs.existsSync(filePath)) {
-      const content = fs.readFileSync(filePath, 'utf8');
-      return JSON.parse(content);
-    }
-  } catch (e) {
-    console.error('Error reading JSON file:', e);
-  }
-  return [];
-}
-
-app.get('/api/auth/allowed-users', (req: Request, res: Response) => {
-  try {
-    const staffUsers = readJsonFile(STAFF_USERS_PATH);
-    const participants = readJsonFile(PARTICIPANTS_PATH);
-    res.json({ staffUsers, participants });
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-app.get('/api/auth/check-access', (req: Request, res: Response) => {
-  try {
-    const email = ((req.query.email as string) || '').toLowerCase();
-    if (!email) return res.status(400).json({ allowed: false, error: 'Email required' });
-    
-    const staffUsers = readJsonFile(STAFF_USERS_PATH);
-    const participants = readJsonFile(PARTICIPANTS_PATH);
-    
-    const staffUser = staffUsers.find((u: any) => (u.email || '').toLowerCase() === email);
-    if (staffUser) {
-      return res.json({ allowed: true, type: 'staff', user: staffUser });
-    }
-    
-    const participant = participants.find((p: any) => (p.email || '').toLowerCase() === email);
-    if (participant) {
-      return res.json({ allowed: true, type: 'participant', user: participant });
-    }
-    
-    res.json({ allowed: false });
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
-});
-

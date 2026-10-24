@@ -123,13 +123,13 @@ export const TeamsPage: React.FC = () => {
       }
 
       if (targetTeam.members.length >= activeEvent.maxTeamSize) {
-        throw new Error(`This squad has reached the maximum capacity of ${activeEvent.maxTeamSize} researchers.`);
+        throw new Error(`This team has reached the maximum capacity of ${activeEvent.maxTeamSize} members.`);
       }
 
       const newMember: TeamMember = {
         userId: user.uid,
         email: user.email || '',
-        displayName: profile?.displayName || user.displayName || 'Synthesizer',
+        displayName: profile?.displayName || user.displayName || 'Member',
         role: 'member',
         joinedAt: new Date().toISOString(),
       };
@@ -162,7 +162,7 @@ export const TeamsPage: React.FC = () => {
     return (
       <div className="max-w-7xl mx-auto px-4 py-16 text-center text-stone-600">
         <div className="w-10 h-10 border-4 border-amber-500/20 border-t-emerald-600 rounded-full animate-spin mx-auto mb-3" />
-        <p className="text-xs font-semibold text-stone-700">Loading squad roster and clearances...</p>
+        <p className="text-xs font-semibold text-stone-700">Loading team roster...</p>
       </div>
     );
   }
@@ -172,14 +172,14 @@ export const TeamsPage: React.FC = () => {
       <div>
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-300 font-mono text-[11px] font-bold mb-2 shadow-xs">
           <FlaskConical className="w-3.5 h-3.5 text-amber-700" />
-          <span>codeLab Squad Formations</span>
+          <span>codeLab Team Formations</span>
         </div>
         <h1 className="text-2xl sm:text-3xl font-black text-stone-900 tracking-tight">
-          Specimen Squad Management
+          Team Management
         </h1>
         <p className="text-xs sm:text-sm text-stone-600 mt-1">
-          Form your research unit for <span className="font-bold text-amber-800">{activeEvent?.title || 'active hackathon'}</span>.
-          Allowed squad capacity: {activeEvent?.minTeamSize || 1} to {activeEvent?.maxTeamSize || 4} members.
+          Form your team for <span className="font-bold text-amber-800">{activeEvent?.title || 'active hackathon'}</span>.
+          Allowed team capacity: {activeEvent?.minTeamSize || 1} to {activeEvent?.maxTeamSize || 4} members.
         </p>
       </div>
 
@@ -308,7 +308,7 @@ export const TeamsPage: React.FC = () => {
                     required
                     value={createTeamName}
                     onChange={(e) => setCreateTeamName(e.target.value)}
-                    placeholder="e.g. Catalytic Synthesizers"
+                    placeholder="e.g. Code Crafters"
                     className="clay-input"
                   />
                 </div>

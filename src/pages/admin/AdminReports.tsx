@@ -59,7 +59,7 @@ export const AdminReportsPage: React.FC = () => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `codeLab_specimen_reports_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute('download', `codeLab_evaluation_reports_${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -100,11 +100,11 @@ export const AdminReportsPage: React.FC = () => {
           <div className="w-full bg-emerald-200/80 h-2.5 rounded-full overflow-hidden mt-3 border border-emerald-300">
             <div className="bg-emerald-600 h-full rounded-full transition-all duration-700" style={{ width: `${completionRate}%` }} />
           </div>
-          <span className="text-[11px] font-semibold text-emerald-800 mt-2 block">{completed} of {teams.length} specimens sealed</span>
+          <span className="text-[11px] font-semibold text-emerald-800 mt-2 block">{completed} of {teams.length} teams completed</span>
         </div>
 
         <div className="clay-card-yellow p-6">
-          <span className="text-xs font-bold text-amber-900 block mb-1">Average Catalytic Score</span>
+          <span className="text-xs font-bold text-amber-900 block mb-1">Average Score</span>
           <div className="text-3xl font-black text-amber-950 font-mono">{averageScore}</div>
           <p className="text-[11px] font-semibold text-amber-800 mt-2">Across evaluated rubric dimensions</p>
         </div>
@@ -112,7 +112,7 @@ export const AdminReportsPage: React.FC = () => {
         <div className="clay-card-orange p-6">
           <span className="text-xs font-bold text-orange-900 block mb-1">Total Intake Squads</span>
           <div className="text-3xl font-black text-orange-950 font-mono">{teams.length}</div>
-          <p className="text-[11px] font-semibold text-orange-800 mt-2">Enrolled in active hackathon synthesis</p>
+          <p className="text-[11px] font-semibold text-orange-800 mt-2">Enrolled in active hackathon event</p>
         </div>
       </div>
 
@@ -121,15 +121,15 @@ export const AdminReportsPage: React.FC = () => {
         <div className="p-5 border-b border-stone-200/80 flex justify-between items-center bg-stone-50/60">
           <div className="flex items-center gap-2">
             <FlaskConical className="w-4 h-4 text-amber-700" />
-            <h3 className="font-black text-stone-900 text-sm">Specimen Synthesis Matrix</h3>
+            <h3 className="font-black text-stone-900 text-sm">Team Evaluation Matrix</h3>
           </div>
-          <span className="text-xs font-mono font-bold text-stone-500">{teams.length} specimens enrolled</span>
+          <span className="text-xs font-mono font-bold text-stone-500">{teams.length} teams enrolled</span>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead className="bg-stone-100/80 border-b border-stone-200 text-stone-700 uppercase font-bold tracking-wider text-[11px]">
               <tr>
-                <th className="py-3 px-4">Specimen Team</th>
+                <th className="py-3 px-4">Team Name</th>
                 <th className="py-3 px-4">Problem Code</th>
                 <th className="py-3 px-4">Status</th>
                 <th className="py-3 px-4 text-right">Awarded Score</th>
@@ -149,7 +149,7 @@ export const AdminReportsPage: React.FC = () => {
                         </span>
                       ) : (
                         <span className="clay-pill bg-amber-100 text-amber-800 border-amber-200 text-[10px]">
-                          Pending Catalysis
+                          Pending Review
                         </span>
                       )}
                     </td>
@@ -162,7 +162,7 @@ export const AdminReportsPage: React.FC = () => {
               {teams.length === 0 && (
                 <tr>
                   <td colSpan={4} className="py-8 text-center text-stone-500 font-semibold">
-                    No specimen squads registered in this event yet.
+                    No teams registered in this event yet.
                   </td>
                 </tr>
               )}

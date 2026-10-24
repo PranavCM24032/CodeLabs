@@ -94,7 +94,7 @@ export const ParticipantDashboard: React.FC = () => {
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse" />
             <span className="font-mono text-xs font-bold uppercase tracking-wider text-amber-900">
-              codeLab Synthesis Workbench
+              codeLab Participant Workbench
             </span>
           </div>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-200/80 text-amber-950 font-mono text-[11px] font-bold border border-amber-300">
@@ -137,7 +137,7 @@ export const ParticipantDashboard: React.FC = () => {
               {userTeam?.name || 'No Squad Formed'}
             </div>
             <div className="font-mono text-xs text-stone-500 mt-0.5 font-semibold">
-              {userTeam ? `${userTeam.members.length} researchers` : 'Join or create squad'}
+              {userTeam ? `${userTeam.members.length} members` : 'Join or create squad'}
             </div>
           </div>
         </div>
@@ -158,7 +158,7 @@ export const ParticipantDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Specimen Conduit */}
+        {/* Repository Conduit */}
         <div className="clay-card-green p-5">
           <div className="flex items-center justify-between text-xs font-bold text-emerald-900 mb-1">
             <span>Repository Conduit</span>
@@ -174,7 +174,7 @@ export const ParticipantDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Catalytic Freeze Status */}
+        {/* Submission Freeze Status */}
         <div className="clay-card-orange p-5">
           <div className="flex items-center justify-between text-xs font-bold text-orange-900 mb-1">
             <span>Freeze Status</span>
@@ -244,7 +244,7 @@ export const ParticipantDashboard: React.FC = () => {
             <div className="flex items-center gap-2">
               <ShieldCheck className="w-5 h-5 text-emerald-700" />
               <h3 className="font-black text-sm sm:text-base text-emerald-950">
-                Sealed Commit Specimen
+                Sealed Commit Submission
               </h3>
             </div>
             <span className="clay-pill bg-emerald-200 text-emerald-900 border-emerald-300 text-[10px]">
@@ -395,7 +395,7 @@ export const ParticipantDashboard: React.FC = () => {
             <div>
               <span className="font-mono text-[10px] font-black text-amber-800">STAGE 02</span>
               <h4 className="font-bold text-xs text-stone-900 mt-0.5">Deadline Freeze</h4>
-              <p className="text-[11px] text-stone-600 mt-1">Lock immutable commit SHA to halt further specimen alterations.</p>
+              <p className="text-[11px] text-stone-600 mt-1">Lock immutable commit SHA to halt further submission alterations.</p>
             </div>
             <div className="mt-3">
               <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${submission?.frozenCommitSha ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-amber-100 text-amber-800 border border-amber-200'}`}>
@@ -420,7 +420,7 @@ export const ParticipantDashboard: React.FC = () => {
           <div className="p-3.5 rounded-2xl bg-white/70 border border-amber-200/80 flex flex-col justify-between">
             <div>
               <span className="font-mono text-[10px] font-black text-amber-800">STAGE 04</span>
-              <h4 className="font-bold text-xs text-stone-900 mt-0.5">Synthesis Release</h4>
+              <h4 className="font-bold text-xs text-stone-900 mt-0.5">Leaderboard Release</h4>
               <p className="text-[11px] text-stone-600 mt-1">Standings published to public leaderboard with sealed certificates.</p>
             </div>
             <div className="mt-3">

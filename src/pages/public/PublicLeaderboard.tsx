@@ -36,7 +36,7 @@ export const PublicLeaderboardPage: React.FC = () => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `codelab-bauhaus-synthesis-${selectedEventId}.csv`;
+        a.download = `codelab-leaderboard-${selectedEventId}.csv`;
         a.click();
         window.URL.revokeObjectURL(url);
       } else {
@@ -54,7 +54,7 @@ export const PublicLeaderboardPage: React.FC = () => {
         const encodedUri = encodeURI(csvContent);
         const link = document.createElement('a');
         link.setAttribute('href', encodedUri);
-        link.setAttribute('download', `codelab-bauhaus-synthesis-${selectedEventId}.csv`);
+        link.setAttribute('download', `codelab-leaderboard-${selectedEventId}.csv`);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -88,7 +88,7 @@ export const PublicLeaderboardPage: React.FC = () => {
             <div className="flex items-center gap-2">
               <div className="w-3.5 h-3.5 rounded-full bg-amber-500 border border-stone-900" />
               <span className="font-mono text-xs font-black uppercase tracking-widest text-stone-900">
-                BAUHAUS // SYNTHESIS STANDINGS
+                STANDINGS // OFFICIAL LEADERBOARD
               </span>
             </div>
             <span className="font-mono text-xs font-black px-2.5 py-1 bg-white border-2 border-stone-900 rounded-full text-stone-900">
@@ -102,7 +102,7 @@ export const PublicLeaderboardPage: React.FC = () => {
                 InterCollege HackGrid 2025
               </h1>
               <p className="text-xs sm:text-sm text-stone-700 font-medium font-mono mt-1">
-                Specimen standings normalized across multi-reagent rubric assays. Form follows function.
+                Official standings normalized across rubric evaluations. Verified rankings.
               </p>
             </div>
 
@@ -209,7 +209,7 @@ export const PublicLeaderboardPage: React.FC = () => {
             <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-500 pointer-events-none" />
             <input
               type="text"
-              placeholder="Filter specimen squads by name or research topic..."
+              placeholder="Filter teams by name or challenge topic..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="clay-input w-full min-h-[44px] pl-10 pr-4 text-xs font-mono border-2 border-stone-900"
@@ -223,11 +223,11 @@ export const PublicLeaderboardPage: React.FC = () => {
             <div className="flex items-center gap-2">
               <FlaskConical className="w-4 h-4 text-emerald-700" />
               <h2 className="text-sm font-black text-stone-900 uppercase font-mono">
-                Full Specimen Cohort Standings
+                Full Team Standings
               </h2>
             </div>
             <span className="font-mono text-xs font-bold text-stone-500">
-              {filteredStandings.length} Cohorts
+              {filteredStandings.length} Teams
             </span>
           </div>
 

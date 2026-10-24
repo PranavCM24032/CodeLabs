@@ -82,7 +82,7 @@ export const EvaluationFormPage: React.FC = () => {
     setSubmitting(true);
     setFeedback(null);
     try {
-      const currentTeamName = team?.name || teamId || 'Team Specimen';
+      const currentTeamName = team?.name || teamId || 'Team';
       const evalId = `eval_${teamId || 'unknown'}_round_1`;
       const payload: Evaluation = {
         id: evalId,

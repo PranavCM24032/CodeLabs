@@ -39,7 +39,7 @@ export const EventsDirectory: React.FC = () => {
           },
           {
             id: 'event-devpulse-2025',
-            title: 'DevPulse National AI Reagent Sprint',
+            title: 'DevPulse National AI Sprint',
             slug: 'devpulse-2025',
             submissionDeadline: new Date(Date.now() + 86400000 * 19).toISOString(),
             createdBy: 'admin',
@@ -138,7 +138,7 @@ export const EventsDirectory: React.FC = () => {
             <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-500 pointer-events-none" />
             <input
               className="clay-input w-full min-h-[44px] pl-10 pr-4 text-xs font-mono border-2 border-stone-900"
-              placeholder="Search codeLab assays by title, specimen track, keyword..."
+              placeholder="Search codeLab events by title, track, keyword..."
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -249,14 +249,14 @@ export const EventsDirectory: React.FC = () => {
                       <span>{evt.minTeamSize}–{evt.maxTeamSize} Researchers</span>
                     </span>
                     <span>·</span>
-                    <span>{evt.rounds?.length || 2} Assay Rounds</span>
+                    <span>{evt.rounds?.length || 2} Evaluation Rounds</span>
                   </div>
 
                   <Link
                     to={`/app/dashboard?eventId=${evt.id}`}
                     className="clay-btn-primary min-h-[44px] px-5 py-2.5 text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 border-2 border-stone-900 self-start sm:self-auto"
                   >
-                    <span>Enter Specimen Portal</span>
+                    <span>Enter Event Portal</span>
                     <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
