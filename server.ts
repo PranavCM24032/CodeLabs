@@ -286,9 +286,6 @@ app.all('/api/export/leaderboard-csv', (req: Request, res: Response) => {
 
 // Vite middleware in dev or static files in production
 
-export default app;
-
-
 // Serve static in production (Vercel)
 const distPath = path.resolve(__dirname, 'dist');
 app.use(express.static(distPath));
