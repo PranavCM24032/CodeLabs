@@ -1,4 +1,4 @@
-﻿import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from 'firebase/auth';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { auth, db, googleProvider, handleFirestoreError, OperationType, testFirestoreConnection } from '../firebase/config';
@@ -37,6 +37,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const email = (firebaseUser.email || '').toLowerCase();
       const accessCheck = await checkAccess(email);
       if (!accessCheck.allowed) {
+  // 🚨 User NOT on the allow‑list
+  // Show a clear message so the user knows why they’re being kicked out
+  // Replace `window.alert` with your UI’s toast/notification if desired
+  window.alert('Your email address is not authorized to use this application. Please contact the administrator.');
+
+  // Keep the original security flow – sign the user out and clear state.
+  setAccessDenied(true);
+  try { await signOut(auth); } catch (e) {}
+  setUser(null);
+  setProfile(null);
+  return;
         setAccessDenied(true);
         try { await signOut(auth); } catch (e) {}
         setUser(null);
