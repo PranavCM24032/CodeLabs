@@ -122,7 +122,17 @@ export const SubmissionPage: React.FC = () => {
     setInsightsError('');
     try {
       const response = await fetch(`/api/repository-insights?repoUrl=${encodeURIComponent(repoUrl.trim())}`);
-      const data = await response.json();
+      const body = await response.text();
+      let data: RepositoryInsights & { error?: string };
+      try {
+        data = JSON.parse(body);
+      } catch {
+        throw new Error(
+          response.ok
+            ? 'Repository service returned an unexpected response. Please try again.'
+            : `Repository service error (${response.status}). Please try again or check the server logs.`
+        );
+      }
       if (!response.ok) throw new Error(data.error || 'Could not analyse this repository.');
       setInsights(data);
       setBranch(data.defaultBranch || branch);
