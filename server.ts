@@ -313,8 +313,10 @@ if (fs.existsSync(distPath)) {
   });
 }
 
-// Start listener for standalone/local environment (Vercel invokes exported handler)
-if (!process.env.VERCEL) {
+// Start a listener only for local development. Vercel imports the Express app as a
+// serverless handler; starting a second listener there causes function invocation failures.
+const isServerlessRuntime = process.env.NODE_ENV === 'production' || Boolean(process.env.VERCEL || process.env.VERCEL_REGION);
+if (!isServerlessRuntime) {
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`CodeLab server running at http://localhost:${PORT}`);
   });
