@@ -33,13 +33,6 @@ export async function checkAccess(email: string): Promise<{
   type?: 'staff' | 'participant';
   user?: any;
 }> {
-  // All e‑mails are now allowed – ignore the JSON allow‑list.
-  return {
-    allowed: true,
-    type: 'staff',
-    user: { email, name: email.split('@')[0], role: 'participant' },
-  };
-}
   try {
     const res = await fetch(`${API_BASE}/api/auth/check-access?email=` + encodeURIComponent(email));
     if (res.ok) {
@@ -50,6 +43,9 @@ export async function checkAccess(email: string): Promise<{
   }
   return { allowed: false };
 }
+
+
+
 
 
 
