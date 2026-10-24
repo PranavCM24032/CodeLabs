@@ -23,7 +23,6 @@ import { ParticipantResultsPage } from './pages/participant/ParticipantResults';
 import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { JudgingQueuePage } from './pages/admin/JudgingQueue';
 import { EvaluationFormPage } from './pages/admin/EvaluationForm';
-import { RepoForensicsView } from './pages/admin/RepoForensicsView';
 import { AdminReportsPage } from './pages/admin/AdminReports';
 
 // Superadmin Pages
