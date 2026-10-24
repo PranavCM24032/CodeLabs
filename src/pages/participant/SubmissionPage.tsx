@@ -102,6 +102,20 @@ export const SubmissionPage: React.FC = () => {
     load();
   }, [user]);
 
+  useEffect(() => {
+    if (!/^https?:\/\/github\.com\/[^/]+\/[^/]+/i.test(repoUrl.trim())) {
+      setInsights(null);
+      setInsightsError('');
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      void loadRepositoryInsights();
+    }, 700);
+
+    return () => window.clearTimeout(timer);
+  }, [repoUrl]);
+
   const loadRepositoryInsights = async () => {
     if (!/^https?:\/\/github\.com\/[^/]+\/[^/]+/i.test(repoUrl.trim())) return;
     setInsightsLoading(true);
@@ -365,7 +379,6 @@ export const SubmissionPage: React.FC = () => {
               type="text"
               value={repoUrl}
               onChange={(e) => setRepoUrl(e.target.value)}
-              onBlur={loadRepositoryInsights}
               className="w-full bg-surface-container-lowest text-on-surface font-mono text-xs rounded-xl pl-9 pr-20 py-2.5 focus:outline-none border border-outline-variant/30"
             />
             <button
