@@ -24,6 +24,118 @@ app.get(['/api/health', '/health'], (_req: Request, res: Response) => {
   });
 });
 
+type GitHubContributor = { login: string; contributions: number; avatarUrl?: string };
+
+function getGitHubRepository(url: string): { owner: string; repo: string } | null {
+  try {
+    const parsed = new URL(url.trim());
+    if (parsed.hostname !== 'github.com') return null;
+    const [owner, repo] = parsed.pathname.split('/').filter(Boolean);
+    if (!owner || !repo) return null;
+    return { owner, repo: repo.replace(/\.git$/, '') };
+  } catch {
+    return null;
+  }
+}
+
+function getPageCount(linkHeader: string | null): number | null {
+  const last = linkHeader?.match(/[?&]page=(\d+)[^>]*>; rel="last"/);
+  return last ? Number(last[1]) : null;
+}
+
+// Repository metadata only. Git history cannot reliably tell whether code is human- or AI-written;
+// plagiarism detection needs a configured comparison corpus and is therefore reported separately.
+app.get(['/api/repository-insights', '/repository-insights'], async (req: Request, res: Response) => {
+  const target = getGitHubRepository(String(req.query.repoUrl || ''));
+  if (!target) return res.status(400).json({ error: 'Enter a valid GitHub repository URL.' });
+
+  const baseUrl = `https://api.github.com/repos/${encodeURIComponent(target.owner)}/${encodeURIComponent(target.repo)}`;
+  const headers: Record<string, string> = {
+    Accept: 'application/vnd.github+json',
+    'User-Agent': 'CodeLab-Hackathon-Portal',
+  };
+  if (process.env.GITHUB_TOKEN) headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
+
+  try {
+    const [repoResponse, commitsResponse, contributorsResponse] = await Promise.all([
+      fetch(baseUrl, { headers }),
+      fetch(`${baseUrl}/commits?per_page=1`, { headers }),
+      fetch(`${baseUrl}/contributors?per_page=100&anon=1`, { headers }),
+    ]);
+
+    if (!repoResponse.ok) {
+      const message = repoResponse.status === 404
+        ? 'Repository not found or it is private. Add a GitHub token on the server for private repositories.'
+        : `GitHub could not read this repository (${repoResponse.status}).`;
+      return res.status(repoResponse.status).json({ error: message });
+    }
+    if (!commitsResponse.ok || !contributorsResponse.ok) {
+      return res.status(502).json({ error: 'GitHub repository metadata could not be loaded.' });
+    }
+
+    const repo = await repoResponse.json() as { default_branch: string; updated_at: string; license?: { spdx_id?: string } };
+    const commits = await commitsResponse.json() as Array<{ sha: string; commit: { message: string; author: { date: string; name: string } } }>;
+    const contributorsRaw = await contributorsResponse.json() as Array<{ login?: string; name?: string; contributions: number; avatar_url?: string }>;
+    const totalCommits = getPageCount(commitsResponse.headers.get('link')) ?? commits.length;
+    const contributors: GitHubContributor[] = contributorsRaw
+      .map((item) => ({ login: item.login || item.name || 'Unknown contributor', contributions: item.contributions, avatarUrl: item.avatar_url }))
+      .sort((a, b) => b.contributions - a.contributions)
+      .slice(0, 12);
+    const contributionTotal = contributors.reduce((sum, item) => sum + item.contributions, 0);
+    const latest = commits[0];
+    const lastCommitPage = getPageCount(commitsResponse.headers.get('link'));
+    const [firstCommitResponse, pullRequestsResponse, branchesResponse, languagesResponse, rootFilesResponse, commitActivityResponse, codeFrequencyResponse] = await Promise.all([
+      lastCommitPage ? fetch(`${baseUrl}/commits?per_page=1&page=${lastCommitPage}`, { headers }) : Promise.resolve(null),
+      fetch(`${baseUrl}/pulls?state=all&per_page=1`, { headers }),
+      fetch(`${baseUrl}/branches?per_page=1`, { headers }),
+      fetch(`${baseUrl}/languages`, { headers }),
+      fetch(`${baseUrl}/contents`, { headers }),
+      fetch(`${baseUrl}/stats/commit_activity`, { headers }),
+      fetch(`${baseUrl}/stats/code_frequency`, { headers }),
+    ]);
+    const firstCommit = firstCommitResponse?.ok ? (await firstCommitResponse.json() as Array<{ commit: { author: { date: string } } }>)[0] : null;
+    const languages = languagesResponse.ok ? await languagesResponse.json() as Record<string, number> : {};
+    const rootFiles = rootFilesResponse.ok ? await rootFilesResponse.json() as Array<{ name: string }> : [];
+    const rootNames = new Set(rootFiles.map((file) => file.name.toLowerCase()));
+    const activity = commitActivityResponse.ok ? await commitActivityResponse.json() as Array<{ week: number; total: number }> : [];
+    const codeFrequency = codeFrequencyResponse.ok ? await codeFrequencyResponse.json() as Array<[number, number, number]> : [];
+
+    return res.json({
+      repository: `${target.owner}/${target.repo}`,
+      defaultBranch: repo.default_branch,
+      totalCommits,
+      totalContributors: contributorsRaw.length,
+      lastCommit: latest ? {
+        sha: latest.sha,
+        message: latest.commit.message,
+        authoredAt: latest.commit.author.date,
+        author: latest.commit.author.name,
+      } : null,
+      contributors: contributors.map((item) => ({ ...item, percentage: contributionTotal ? Math.round((item.contributions / contributionTotal) * 100) : 0 })),
+      firstCommitAt: firstCommit?.commit.author.date || null,
+      pullRequests: pullRequestsResponse.ok ? (getPageCount(pullRequestsResponse.headers.get('link')) ?? 0) : null,
+      branches: branchesResponse.ok ? (getPageCount(branchesResponse.headers.get('link')) ?? 1) : null,
+      languages: Object.entries(languages).sort(([, a], [, b]) => b - a).slice(0, 5).map(([name, bytes]) => ({ name, bytes })),
+      projectHealth: {
+        readme: rootNames.has('readme.md'),
+        license: rootNames.has('license') || rootNames.has('license.md'),
+        gitignore: rootNames.has('.gitignore'),
+        ci: rootNames.has('.github'),
+      },
+      commitActivity: activity.slice(-12).map((week) => ({ week: week.week, commits: week.total })),
+      codeChurn: codeFrequency.slice(-12).map(([week, additions, deletions]) => ({ week, additions, deletions: Math.abs(deletions) })),
+      checks: {
+        repositoryAccess: 'passed',
+        humanAiAuthorship: 'not_determinable',
+        plagiarism: 'requires_comparison_corpus',
+      },
+      fetchedAt: new Date().toISOString(),
+    });
+  } catch (err: any) {
+    return res.status(502).json({ error: err.message || 'Unable to reach GitHub.' });
+  }
+});
+
 // Helper to normalize and tokenize code for similarity analysis
 function tokenizeCode(code: string): string[] {
   const stripped = code

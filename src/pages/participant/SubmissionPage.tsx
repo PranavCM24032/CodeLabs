@@ -24,6 +24,23 @@ import {
 } from '../../services/firestoreService';
 import { HackathonEvent, Team, Submission, RepoProvider, AnalysisJob } from '../../types';
 
+type RepositoryInsights = {
+  repository: string;
+  defaultBranch: string;
+  totalCommits: number;
+  totalContributors: number;
+  lastCommit: { sha: string; message: string; authoredAt: string; author: string } | null;
+  contributors: { login: string; contributions: number; percentage: number }[];
+  firstCommitAt: string | null;
+  pullRequests: number | null;
+  branches: number | null;
+  languages: { name: string; bytes: number }[];
+  projectHealth: { readme: boolean; license: boolean; gitignore: boolean; ci: boolean };
+  commitActivity: { week: number; commits: number }[];
+  codeChurn: { week: number; additions: number; deletions: number }[];
+  checks: { humanAiAuthorship: string; plagiarism: string };
+};
+
 export const SubmissionPage: React.FC = () => {
   const { user } = useAuth();
   const [activeEvent, setActiveEvent] = useState<HackathonEvent | null>(null);
@@ -45,6 +62,9 @@ export const SubmissionPage: React.FC = () => {
   const [locking, setLocking] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [insights, setInsights] = useState<RepositoryInsights | null>(null);
+  const [insightsLoading, setInsightsLoading] = useState(false);
+  const [insightsError, setInsightsError] = useState('');
 
   useEffect(() => {
     async function load() {
@@ -81,6 +101,25 @@ export const SubmissionPage: React.FC = () => {
     }
     load();
   }, [user]);
+
+  const loadRepositoryInsights = async () => {
+    if (!/^https?:\/\/github\.com\/[^/]+\/[^/]+/i.test(repoUrl.trim())) return;
+    setInsightsLoading(true);
+    setInsightsError('');
+    try {
+      const response = await fetch(`/api/repository-insights?repoUrl=${encodeURIComponent(repoUrl.trim())}`);
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Could not analyse this repository.');
+      setInsights(data);
+      setBranch(data.defaultBranch || branch);
+      if (data.lastCommit?.sha) setCommitSha(data.lastCommit.sha);
+    } catch (err: any) {
+      setInsights(null);
+      setInsightsError(err.message || 'Could not analyse this repository.');
+    } finally {
+      setInsightsLoading(false);
+    }
+  };
 
   const handleCopy = (text: string, type: 'url' | 'sha') => {
     navigator.clipboard.writeText(text);
@@ -132,14 +171,14 @@ export const SubmissionPage: React.FC = () => {
         status: 'completed',
         similarityScore: 0.0,
         lateBulkUploadIndicator: false,
-        totalCommits: 38,
-        activeContributors: 4,
+        totalCommits: insights?.totalCommits || 0,
+        activeContributors: insights?.totalContributors || 0,
         findingsCount: 0,
         analyzedAt: new Date().toISOString(),
         logs: [
           `Snapshot frozen at ${new Date().toISOString()}`,
           `Commit verified: ${commitSha.substring(0, 10)}`,
-          `AST Similarity: 0.0% Clean`,
+          insights ? `${insights.totalCommits} commits from ${insights.totalContributors} contributors` : 'Repository insights not available',
         ],
       };
       await saveAnalysisJob(activeEvent.id, job);
@@ -316,10 +355,9 @@ export const SubmissionPage: React.FC = () => {
         <div className="flex flex-col space-y-1">
           <div className="flex items-center justify-between">
             <label className="font-mono text-[10px] text-on-surface-variant uppercase">GitHub repository link</label>
-            <span className="inline-flex items-center gap-1 font-mono text-[10px] text-secondary bg-surface-container px-2 py-0.5 rounded border border-outline-variant/20">
-              <CheckCircle2 className="w-3 h-3 text-secondary" />
-              Verified by GitHub App
-            </span>
+            <button type="button" onClick={loadRepositoryInsights} disabled={insightsLoading || !repoUrl} className="font-mono text-[10px] text-primary disabled:opacity-50">
+              {insightsLoading ? 'Checking…' : 'Check repository'}
+            </button>
           </div>
           <div className="relative flex items-center">
             <Terminal className="absolute left-3 text-outline w-4 h-4 pointer-events-none" />
@@ -327,6 +365,7 @@ export const SubmissionPage: React.FC = () => {
               type="text"
               value={repoUrl}
               onChange={(e) => setRepoUrl(e.target.value)}
+              onBlur={loadRepositoryInsights}
               className="w-full bg-surface-container-lowest text-on-surface font-mono text-xs rounded-xl pl-9 pr-20 py-2.5 focus:outline-none border border-outline-variant/30"
             />
             <button
@@ -395,53 +434,56 @@ export const SubmissionPage: React.FC = () => {
             </div>
             <div className="flex items-center justify-between text-on-surface-variant font-mono text-[10px]">
               <span className="text-secondary font-medium">{copiedSha ? 'SHA copied to clipboard' : ''}</span>
-              <span className="ml-auto">Committed 12m ago by @alex-dev</span>
+              <span className="ml-auto">{insights?.lastCommit ? `${new Date(insights.lastCommit.authoredAt).toLocaleString()} by ${insights.lastCommit.author}` : 'Check repository to load commit details'}</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Automated Pre-Flight Scan */}
-      <div className="flex flex-col space-y-2">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5">
+      <section className="rounded-2xl bg-surface-container-low p-4 sm:p-5 space-y-4 border border-outline-variant/30">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
             <ShieldCheck className="w-4 h-4 text-secondary" />
-            <h2 className="font-bold text-sm text-on-surface">Pre-Flight Validation</h2>
+            <h2 className="font-bold text-sm text-on-surface">Repository insights</h2>
           </div>
-          <span className="px-2 py-0.5 rounded bg-secondary-container/30 text-secondary font-mono text-[10px] font-bold border border-secondary-container/40">
-            5 / 5 READY
-          </span>
+          {insights && <span className="font-mono text-[10px] text-secondary">GitHub data loaded</span>}
         </div>
-        <p className="text-xs text-on-surface-variant">Automated validation criteria required prior to code lock.</p>
 
-        <div className="space-y-1.5 pt-1">
-          {[
-            { label: 'Public / Authorized Read Access', note: 'OAuth permission handshake active', tag: '200 OK', tagColor: 'text-secondary' },
-            { label: 'License & Readme Present', note: 'README.md (14.2 KB) validated', tag: 'MIT LICENSE', tagColor: 'text-primary' },
-            { label: 'Build Pipeline Config', note: '.github/workflows/ci.yml', tag: 'DETECTED', tagColor: 'text-tertiary' },
-            { label: 'Commit History Integrity', note: 'No squash rebases, clean timeline', tag: '38 COMMITS', tagColor: 'text-secondary' },
-            { label: 'AST Similarity Engine', note: '0 cross-team block overlaps', tag: 'CLEAN 0.0%', tagColor: 'text-secondary' },
-          ].map((item, i) => (
-            <div
-              key={i}
-              className="flex items-center justify-between p-2.5 rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors border border-outline-variant/20"
-            >
-              <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-5 h-5 rounded-full bg-secondary-container/20 text-secondary flex items-center justify-center shrink-0">
-                  <Check className="w-3.5 h-3.5" />
-                </div>
-                <div className="min-w-0">
-                  <div className="font-medium text-xs text-on-surface truncate">{item.label}</div>
-                  <div className="font-mono text-[10px] text-on-surface-variant">{item.note}</div>
-                </div>
-              </div>
-              <span className={`font-mono text-[10px] px-2 py-0.5 rounded bg-surface-container ${item.tagColor} font-semibold shrink-0`}>
-                {item.tag}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
+        {insightsError && <p className="text-xs text-error">{insightsError}</p>}
+        {!insights && !insightsLoading && !insightsError && <p className="text-xs text-on-surface-variant">Add a public GitHub link, then choose “Check repository” to see live project activity.</p>}
+        {insightsLoading && <p className="text-xs text-on-surface-variant">Loading repository activity…</p>}
+
+        {insights && <>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div className="rounded-xl bg-surface-container-lowest p-3 border border-outline-variant/20"><span className="block text-[10px] text-on-surface-variant">Last commit</span><strong className="block text-xs mt-1">{insights.lastCommit ? new Date(insights.lastCommit.authoredAt).toLocaleString() : 'No commits'}</strong></div>
+            <div className="rounded-xl bg-surface-container-lowest p-3 border border-outline-variant/20"><span className="block text-[10px] text-on-surface-variant">Total commits</span><strong className="block text-lg mt-1">{insights.totalCommits}</strong></div>
+            <div className="rounded-xl bg-surface-container-lowest p-3 border border-outline-variant/20"><span className="block text-[10px] text-on-surface-variant">Contributors</span><strong className="block text-lg mt-1">{insights.totalContributors}</strong></div>
+            <div className="rounded-xl bg-surface-container-lowest p-3 border border-outline-variant/20"><span className="block text-[10px] text-on-surface-variant">First commit</span><strong className="block text-xs mt-1">{insights.firstCommitAt ? new Date(insights.firstCommitAt).toLocaleDateString() : 'Unavailable'}</strong></div>
+            <div className="rounded-xl bg-surface-container-lowest p-3 border border-outline-variant/20"><span className="block text-[10px] text-on-surface-variant">Pull requests</span><strong className="block text-lg mt-1">{insights.pullRequests ?? '—'}</strong></div>
+            <div className="rounded-xl bg-surface-container-lowest p-3 border border-outline-variant/20"><span className="block text-[10px] text-on-surface-variant">Branches</span><strong className="block text-lg mt-1">{insights.branches ?? '—'}</strong></div>
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div className="rounded-xl border border-outline-variant/30 p-3"><h3 className="text-xs font-bold">Commits by week</h3><div className="mt-3 h-20 flex items-end gap-1">{insights.commitActivity.map((item) => <div key={item.week} title={`${item.commits} commits`} className="flex-1 min-w-1 rounded-t bg-primary/80" style={{ height: `${Math.max(4, (item.commits / Math.max(...insights.commitActivity.map((entry) => entry.commits), 1)) * 100)}%` }} />)}</div></div>
+            <div className="rounded-xl border border-outline-variant/30 p-3"><h3 className="text-xs font-bold">Lines added / deleted</h3><div className="mt-3 h-20 flex items-end gap-1">{insights.codeChurn.map((item) => <div key={item.week} title={`+${item.additions} / -${item.deletions}`} className="flex-1 min-w-1 flex gap-px items-end h-full"><span className="flex-1 bg-emerald-500 rounded-t" style={{ height: `${Math.max(3, (item.additions / Math.max(...insights.codeChurn.map((entry) => entry.additions), 1)) * 100)}%` }} /><span className="flex-1 bg-rose-400 rounded-t" style={{ height: `${Math.max(3, (item.deletions / Math.max(...insights.codeChurn.map((entry) => entry.deletions), 1)) * 100)}%` }} /></div>)}</div></div>
+          </div>
+
+          <div className="space-y-2">
+            <h3 className="text-xs font-bold text-on-surface">Commit share by contributor</h3>
+            {insights.contributors.map((contributor) => <div key={contributor.login} className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 items-center text-xs"><div><div className="flex justify-between gap-2"><span className="truncate">{contributor.login}</span><span>{contributor.contributions} commits</span></div><div className="h-1.5 mt-1 rounded-full bg-surface-container-highest overflow-hidden"><div className="h-full bg-primary" style={{ width: `${contributor.percentage}%` }} /></div></div><strong>{contributor.percentage}%</strong></div>)}
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-3 text-xs">
+            <div className="rounded-xl border border-outline-variant/30 p-3"><strong>Tech stack</strong><p className="mt-1 text-on-surface-variant">{insights.languages.length ? insights.languages.map((language) => language.name).join(' · ') : 'No language data available'}</p></div>
+            <div className="rounded-xl border border-outline-variant/30 p-3"><strong>Project health</strong><p className="mt-1 text-on-surface-variant">{[['README', insights.projectHealth.readme], ['License', insights.projectHealth.license], ['.gitignore', insights.projectHealth.gitignore], ['CI', insights.projectHealth.ci]].map(([name, ok]) => `${name}: ${ok ? 'yes' : 'no'}`).join(' · ')}</p></div>
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-3 text-xs">
+            <div className="rounded-xl border border-outline-variant/30 p-3"><strong>Human vs AI authorship</strong><p className="mt-1 text-on-surface-variant">GitHub commit data cannot reliably determine whether code was written by a human or AI. This needs a separate review policy/tool.</p></div>
+            <div className="rounded-xl border border-outline-variant/30 p-3"><strong>Plagiarism / copy detection</strong><p className="mt-1 text-on-surface-variant">Available after comparison against other submitted repositories or an approved reference corpus.</p></div>
+          </div>
+        </>}
+      </section>
 
       {/* Snapshot Log History */}
       <div className="flex flex-col space-y-2">
