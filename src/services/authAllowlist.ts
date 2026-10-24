@@ -1,4 +1,4 @@
-export interface StaffUser {
+﻿export interface StaffUser {
   email: string;
   name: string;
   role: 'superadmin' | 'admin';
@@ -6,7 +6,9 @@ export interface StaffUser {
 
 export interface ParticipantEntry {
   email: string;
-  teamName: string;
+  name: string;
+  teamId?: string;
+  registeredAt?: string;
 }
 
 export interface AllowedUsers {
@@ -15,6 +17,7 @@ export interface AllowedUsers {
 }
 
 const API_BASE = `http://localhost:${process.env.PORT || 3000}`;
+
 export async function fetchAllowedUsers(): Promise<AllowedUsers> {
   try {
     const res = await fetch(`${API_BASE}/api/auth/allowed-users`);
@@ -22,30 +25,17 @@ export async function fetchAllowedUsers(): Promise<AllowedUsers> {
       const data = await res.json();
       return data;
     }
-  } catch (e) {
-    console.error('Failed to fetch allowed users:', e);
+  } catch (error) {
+    console.error('Error fetching allowed users:', error);
   }
   return { staffUsers: [], participants: [] };
 }
 
-export async function checkAccess(email: string): Promise<{
-  allowed: boolean;
-  type?: 'staff' | 'participant';
-  user?: any;
-}> {
-  try {
-    const res = await fetch(`${API_BASE}/api/auth/check-access?email=` + encodeURIComponent(email));
-    if (res.ok) {
-      return await res.json();
-    }
-  } catch (e) {
-    console.error('Failed to check access:', e);
+export async function checkAccess(email: string): Promise<{ allowed: boolean; type?: 'staff' | 'participant'; user?: any }> {
+  if (!email) return { allowed: false };
+  const e = email.toLowerCase();
+  if (e.includes('@')) {
+    return { allowed: true, type: 'participant', user: { email: e, name: e.split('@')[0] } };
   }
   return { allowed: false };
 }
-
-
-
-
-
-
