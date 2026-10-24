@@ -5,7 +5,7 @@ import { getUserNotifications } from '../../services/firestoreService';
 import { NotificationItem } from '../../types';
 
 export const Navbar: React.FC = () => {
-  const { user, profile, role, logout, quickLoginDemo } = useAuth();
+  const { user, profile, role, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -136,52 +136,6 @@ export const Navbar: React.FC = () => {
 
           {/* Actions & Profile */}
           <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
-            {/* Quick Demo Switcher (Desktop) */}
-            <div className="hidden lg:flex items-center gap-1 bg-stone-100/80 p-1 rounded-xl border border-stone-200/80">
-              <span className="text-[10px] text-stone-500 uppercase font-mono font-bold px-1">Role:</span>
-              <button
-                onClick={() => {
-                  quickLoginDemo('superadmin');
-                  navigate('/superadmin/dashboard');
-                }}
-                className={`px-2 py-1 rounded-lg text-[11px] font-mono font-semibold transition-all cursor-pointer ${
-                  role === 'superadmin'
-                    ? 'clay-pill bg-orange-600 text-white shadow-sm'
-                    : 'text-stone-600 hover:text-stone-900 hover:bg-white'
-                }`}
-                title="Superadmin"
-              >
-                Root
-              </button>
-              <button
-                onClick={() => {
-                  quickLoginDemo('admin');
-                  navigate('/admin/judging');
-                }}
-                className={`px-2 py-1 rounded-lg text-[11px] font-mono font-semibold transition-all cursor-pointer ${
-                  role === 'admin'
-                    ? 'clay-pill bg-amber-500 text-stone-950 shadow-sm font-bold'
-                    : 'text-stone-600 hover:text-stone-900 hover:bg-white'
-                }`}
-                title="Judge"
-              >
-                Judge
-              </button>
-              <button
-                onClick={() => {
-                  quickLoginDemo('participant');
-                  navigate('/app/dashboard');
-                }}
-                className={`px-2 py-1 rounded-lg text-[11px] font-mono font-semibold transition-all cursor-pointer ${
-                  role === 'participant'
-                    ? 'clay-pill bg-green-600 text-white shadow-sm'
-                    : 'text-stone-600 hover:text-stone-900 hover:bg-white'
-                }`}
-                title="Hacker"
-              >
-                Hacker
-              </button>
-            </div>
 
             {/* Notification Bell */}
             {user && (

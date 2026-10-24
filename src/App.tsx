@@ -121,14 +121,6 @@ export default function App() {
                 }
               />
               <Route
-                path="/admin/analysis/:submissionId"
-                element={
-                  <ProtectedRoute allowedRoles={['admin', 'superadmin']}>
-                    <RepoForensicsView />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
                 path="/admin/reports"
                 element={
                   <ProtectedRoute allowedRoles={['admin', 'superadmin']}>

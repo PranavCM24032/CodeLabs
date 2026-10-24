@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 
@@ -14,20 +15,13 @@ const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 app.use(express.json({ limit: '10mb' }));
 
 // Health Check
-app.get('/api/health', (_req: Request, res: Response) => {
+app.get(['/api/health', '/health'], (_req: Request, res: Response) => {
   res.json({
     status: 'ok',
     service: 'GitTrack Engine',
     timestamp: new Date().toISOString(),
     owner: 'pranavpaunikar.ml24@sbjit.edu.in',
   });
-});
-
-  try {
-    res.json({ success: true, timestamp: new Date().toISOString(), results });
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
 });
 
 // Helper to normalize and tokenize code for similarity analysis
@@ -63,7 +57,7 @@ function calculateNgramSimilarity(tokensA: string[], tokensB: string[], n = 3): 
 }
 
 // 2. SIMILARITY ANALYSIS ENGINE
-app.post('/api/analysis/run-similarity', (req: Request, res: Response) => {
+app.post(['/api/analysis/run-similarity', '/analysis/run-similarity'], (req: Request, res: Response) => {
   try {
     const { submissionId, teamName, codeSampleA, codeSampleB, otherTeamName } = req.body;
 
@@ -138,7 +132,7 @@ export function PaymentWidget({ total, currencyCode }) {
 });
 
 // 3. AUTHORIZED CSV EXPORT (Supports GET and POST)
-app.all('/api/export/leaderboard-csv', (req: Request, res: Response) => {
+app.all(['/api/export/leaderboard-csv', '/export/leaderboard-csv'], (req: Request, res: Response) => {
   try {
     const standings = req.body?.standings || [
       { rank: 1, teamName: 'Team HyperSync', score: 94.2, isTie: false, status: 'Approved & Sealed', lastUpdated: new Date().toISOString() },
@@ -172,13 +166,21 @@ app.all('/api/export/leaderboard-csv', (req: Request, res: Response) => {
   }
 });
 
-// Vite middleware in dev or static files in production
-
-// Serve static in production (Vercel)
+// Serve static files in standalone/local production if dist exists
 const distPath = path.resolve(__dirname, 'dist');
-app.use(express.static(distPath));
-app.get('*', (_req, res) => {
-  res.sendFile(path.resolve(distPath, 'index.html'));
-});
+if (fs.existsSync(distPath)) {
+  app.use(express.static(distPath));
+  app.get('*', (_req, res) => {
+    res.sendFile(path.resolve(distPath, 'index.html'));
+  });
+}
+
+// Start listener for standalone/local environment (Vercel invokes exported handler)
+if (!process.env.VERCEL) {
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`GitTrack server running at http://localhost:${PORT}`);
+  });
+}
+
 export default app;
 

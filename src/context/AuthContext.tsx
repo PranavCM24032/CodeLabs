@@ -22,6 +22,7 @@ interface AuthContextType {
   signInWithGoogle: () => Promise<void>;
   signInWithEmail: (email: string, pass: string) => Promise<void>;
   registerWithEmail: (email: string, pass: string, name: string) => Promise<void>;
+  quickLoginDemo: (asRole: UserRole) => Promise<void>;
   logout: () => Promise<void>;
   bootstrapOwnerAsSuperadmin: () => Promise<boolean>;
   isOwnerEmail: boolean;
@@ -156,7 +157,50 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(false);
     }
   };
-const logout = async () => {
+
+  const quickLoginDemo = async (asRole: UserRole) => {
+    setLoading(true);
+    let demoUid = '';
+    let demoEmail = '';
+    let demoName = '';
+
+    if (asRole === 'superadmin') {
+      demoUid = 'usr_superadmin_root';
+      demoEmail = OWNER_EMAIL;
+      demoName = 'Platform Superadmin (Owner)';
+    } else if (asRole === 'admin') {
+      demoUid = 'usr_judge_04';
+      demoEmail = 'e.vance@mit.edu';
+      demoName = 'Dr. Evelyn Vance (Judge #04)';
+    } else {
+      demoUid = 'usr_aarav_sharma';
+      demoEmail = 'aarav.s@campus.edu';
+      demoName = 'Aarav Sharma (ByteCrafters)';
+    }
+
+    const demoProfile: UserProfile = {
+      uid: demoUid,
+      email: demoEmail,
+      displayName: demoName,
+      role: asRole,
+      status: 'active',
+      createdAt: new Date().toISOString(),
+    };
+
+    const mockUser: any = {
+      uid: demoUid,
+      email: demoEmail,
+      displayName: demoName,
+      photoURL: null,
+      emailVerified: true,
+    };
+
+    setUser(mockUser);
+    setProfile(demoProfile);
+    setLoading(false);
+  };
+
+  const logout = async () => {
     try {
       await signOut(auth);
     } catch (error) {
@@ -223,6 +267,7 @@ const logout = async () => {
         signInWithGoogle,
         signInWithEmail,
         registerWithEmail,
+        quickLoginDemo,
         logout,
         bootstrapOwnerAsSuperadmin,
         isOwnerEmail,
