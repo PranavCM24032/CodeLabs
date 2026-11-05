@@ -12,74 +12,12 @@ export const EventsDirectory: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'all' | 'ongoing' | 'upcoming' | 'past'>('all');
 
   useEffect(() => {
-    getEvents().then((list) => {
-      if (list && list.length > 0) {
-        setEvents(list);
-      } else {
-        setEvents([
-          {
-            id: 'event-hackgrid-2025',
-            title: 'InterCollege HackGrid 2025: Distributed Systems Challenge',
-            description:
-              'State-wide engineering championship challenging teams to build high-concurrency distributed systems with automated code quality checks.',
-            slug: 'hackgrid-2025',
-            submissionDeadline: new Date(Date.now() + 86400000 * 2).toISOString(),
-            createdBy: 'admin',
-            startDate: new Date().toISOString(),
-            endDate: new Date(Date.now() + 86400000 * 3).toISOString(),
-            status: 'active',
-            minTeamSize: 2,
-            maxTeamSize: 4,
-            rounds: [
-              { id: 'r1', order: 1, name: 'Round 1: Technical Audit & Review', maxMarks: 100, weight: 50 },
-              { id: 'r2', order: 2, name: 'Round 2: Live Pitch & Architecture', maxMarks: 100, weight: 50 },
-            ],
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
-          {
-            id: 'event-devpulse-2025',
-            title: 'DevPulse National AI Sprint',
-            slug: 'devpulse-2025',
-            submissionDeadline: new Date(Date.now() + 86400000 * 19).toISOString(),
-            createdBy: 'admin',
-            description:
-              '48-hour buildathon targeting edge-inference agentic architectures. Continuous evaluation with automated synthetic stress test suites.',
-            startDate: new Date(Date.now() + 86400000 * 18).toISOString(),
-            endDate: new Date(Date.now() + 86400000 * 20).toISOString(),
-            status: 'draft',
-            minTeamSize: 2,
-            maxTeamSize: 4,
-            rounds: [
-              { id: 'r1', order: 1, name: 'Agentic Infrastructure Benchmarks', maxMarks: 100, weight: 100 },
-            ],
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
-          {
-            id: 'event-cybershield-2025',
-            title: 'CyberShield Code Security Challenge',
-            slug: 'cybershield-2025',
-            submissionDeadline: new Date(Date.now() + 86400000).toISOString(),
-            createdBy: 'admin',
-            description:
-              'Defensive security gauntlet. Repositories currently under automated diff inspection, AST code tree integrity audits, and live judge review.',
-            startDate: new Date(Date.now() - 86400000 * 2).toISOString(),
-            endDate: new Date(Date.now() + 86400000).toISOString(),
-            status: 'published',
-            minTeamSize: 1,
-            maxTeamSize: 4,
-            rounds: [
-              { id: 'r1', order: 1, name: 'Round 1: Vulnerability Patching', maxMarks: 100, weight: 50 },
-              { id: 'r2', order: 2, name: 'Round 2: Jury Deliberation', maxMarks: 100, weight: 50 },
-            ],
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
-        ]);
-      }
-      setLoading(false);
-    });
+    getEvents()
+      .then((list) => {
+        setEvents(list || []);
+      })
+      .catch(() => setEvents([]))
+      .finally(() => setLoading(false));
   }, []);
 
   const filtered = events.filter((e) => {

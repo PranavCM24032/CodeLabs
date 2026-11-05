@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { getPublishedLeaderboard } from '../../services/firestoreService';
-import { PublishedLeaderboard, LeaderboardEntry } from '../../types';
+import { getEvents, getPublishedLeaderboard } from '../../services/firestoreService';
+import { HackathonEvent, PublishedLeaderboard, LeaderboardEntry } from '../../types';
 import { Download, Search, Award, Circle, Square, ArrowUpRight, FlaskConical } from 'lucide-react';
 
 export const PublicLeaderboardPage: React.FC = () => {
@@ -8,11 +8,25 @@ export const PublicLeaderboardPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [exporting, setExporting] = useState(false);
-  const [selectedEventId, setSelectedEventId] = useState<string>('hackgrid-2025');
+  const [events, setEvents] = useState<HackathonEvent[]>([]);
+  const [selectedEventId, setSelectedEventId] = useState<string>('');
 
   useEffect(() => {
+    getEvents()
+      .then((list) => {
+        setEvents(list || []);
+        if (list && list.length > 0) setSelectedEventId(list[0].id);
+        else setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    if (!selectedEventId) return;
     loadLeaderboardData(selectedEventId);
   }, [selectedEventId]);
+
+  const selectedEvent = events.find((event) => event.id === selectedEventId) || null;
 
   const loadLeaderboardData = async (eventId: string) => {
     setLoading(true);
@@ -99,21 +113,36 @@ export const PublicLeaderboardPage: React.FC = () => {
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div>
               <h1 className="text-2xl sm:text-4xl font-black text-stone-900 tracking-tight uppercase">
-                InterCollege HackGrid 2025
+                {selectedEvent?.title || 'No events available'}
               </h1>
               <p className="text-xs sm:text-sm text-stone-700 font-medium font-mono mt-1">
                 Final rankings for the hackathon.
               </p>
             </div>
 
-            <button
-              onClick={handleExportCSV}
-              disabled={exporting}
-              className="clay-btn-orange min-h-[44px] px-5 py-2.5 text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 border-2 border-stone-900 cursor-pointer self-start sm:self-auto"
-            >
-              <Download className="w-4 h-4" />
-              <span>{exporting ? 'Exporting...' : 'Export CSV'}</span>
-            </button>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 self-start sm:self-auto">
+              {events.length > 1 && (
+                <select
+                  value={selectedEventId}
+                  onChange={(e) => setSelectedEventId(e.target.value)}
+                  className="clay-input min-h-[44px] px-3 text-xs font-mono border-2 border-stone-900"
+                >
+                  {events.map((event) => (
+                    <option key={event.id} value={event.id}>
+                      {event.title}
+                    </option>
+                  ))}
+                </select>
+              )}
+              <button
+                onClick={handleExportCSV}
+                disabled={exporting || !selectedEventId}
+                className="clay-btn-orange min-h-[44px] px-5 py-2.5 text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 border-2 border-stone-900 cursor-pointer"
+              >
+                <Download className="w-4 h-4" />
+                <span>{exporting ? 'Exporting...' : 'Export CSV'}</span>
+              </button>
+            </div>
           </div>
         </section>
 
@@ -237,17 +266,8 @@ export const PublicLeaderboardPage: React.FC = () => {
                 {search ? 'No cohorts match your filter criteria.' : 'No official leaderboard rankings released yet for this event.'}
               </div>
             ) : (
-              filteredStandings.map((team: LeaderboardEntry, idx: number) => (
+              filteredStandings.map((team: LeaderboardEntry) => (
               <React.Fragment key={team.teamId}>
-                {idx === 3 && (
-                  <div className="my-3 p-3 rounded-xl clay-card-yellow border-2 border-amber-400 flex items-center justify-between text-xs font-mono font-black text-stone-900">
-                    <span>FINALS THRESHOLD CUTOFF (78.0 PTS)</span>
-                    <span className="px-2 py-0.5 rounded-full bg-white border border-stone-900 text-[10px]">
-                      QUALIFIED
-                    </span>
-                  </div>
-                )}
-
                 <div className="p-4 rounded-xl border-2 border-stone-900 bg-white flex items-center justify-between gap-4 hover:-translate-y-0.5 transition-transform">
                   <div className="flex items-center gap-3.5 min-w-0">
                     <div

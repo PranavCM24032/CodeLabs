@@ -169,7 +169,17 @@ function calculateNgramSimilarity(tokensA: string[], tokensB: string[], n = 3): 
 // Similarity Analysis Engine
 app.post(['/api/analysis/run-similarity', '/analysis/run-similarity'], (req: Request, res: Response) => {
   try {
-    const { submissionId, codeSampleA, codeSampleB, otherTeamName } = req.body;
+    const {
+      submissionId,
+      codeSampleA,
+      codeSampleB,
+      otherTeamName,
+      comparisonSubmissionId,
+      fileA,
+      fileB,
+      lineRangeA,
+      lineRangeB,
+    } = req.body;
 
     const sampleA = codeSampleA || '';
     const sampleB = codeSampleB || '';
@@ -195,13 +205,13 @@ app.post(['/api/analysis/run-similarity', '/analysis/run-similarity'], (req: Req
       findings.push({
         id: `find_${Date.now()}_1`,
         jobId: `job_${Date.now()}`,
-        submissionId: submissionId || 'sub_current',
-        comparisonSubmissionId: 'sub_benchmark',
-        comparisonTeamName: otherTeamName || 'Team BitCrafters',
-        fileA: 'src/components/PaymentProcessor.tsx',
-        fileB: 'src/modules/PaymentWidget.tsx',
-        lineRangeA: [4, 12] as [number, number],
-        lineRangeB: [5, 13] as [number, number],
+        submissionId: submissionId || '',
+        comparisonSubmissionId: comparisonSubmissionId || '',
+        comparisonTeamName: otherTeamName || '',
+        fileA: fileA || '',
+        fileB: fileB || '',
+        lineRangeA: (Array.isArray(lineRangeA) ? lineRangeA : [0, 0]) as [number, number],
+        lineRangeB: (Array.isArray(lineRangeB) ? lineRangeB : [0, 0]) as [number, number],
         matchPercentage,
         similarityMetric: '3-Gram Token Jaccard Distance',
         snippetA: sampleA.trim().split('\n').slice(3, 11).join('\n'),

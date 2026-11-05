@@ -43,10 +43,7 @@ export const UsersManagementPage: React.FC = () => {
               name: u.displayName || u.email?.split('@')[0] || 'User',
               email: u.email,
               role: u.role,
-              scope: 'Platform User',
               status: u.status || 'active',
-              evalsDone: 0,
-              verified: true,
               avatar: u.photoURL || null,
             }))
           );
@@ -60,8 +57,6 @@ export const UsersManagementPage: React.FC = () => {
               target: l.entityType,
               time: new Date(l.timestamp).toLocaleTimeString(),
               criterion: l.entityId,
-              oldPoints: '-',
-              newPoints: '-',
               reason: l.details || l.reason || '',
               sha: l.id.slice(0, 7),
             }))
@@ -82,7 +77,7 @@ export const UsersManagementPage: React.FC = () => {
 
   const handleGrantAdmin = async (userId: string) => {
     try {
-      await updateUserRole(userId, 'admin', user?.email || 'superadmin');
+      await updateUserRole(userId, 'admin', user?.email || '');
       setUsers((prev) =>
         prev.map((u) => (u.id === userId ? { ...u, role: 'admin' } : u))
       );
@@ -93,7 +88,7 @@ export const UsersManagementPage: React.FC = () => {
 
   const handleRevokeAdmin = async (userId: string) => {
     try {
-      await updateUserRole(userId, 'participant', user?.email || 'superadmin');
+      await updateUserRole(userId, 'participant', user?.email || '');
       setUsers((prev) =>
         prev.map((u) => (u.id === userId ? { ...u, role: 'participant' } : u))
       );
@@ -113,6 +108,13 @@ export const UsersManagementPage: React.FC = () => {
     if (userFilter === 'suspended') return u.status === 'suspended';
     return true;
   });
+
+  const userCounts = {
+    all: users.length,
+    admin: users.filter((u) => u.role === 'admin' || u.role === 'pending_admin').length,
+    participant: users.filter((u) => u.role === 'participant').length,
+    suspended: users.filter((u) => u.status === 'suspended').length,
+  };
 
   return (
     <div className="flex flex-col w-full pb-16 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 space-y-4 text-on-surface">
@@ -182,10 +184,10 @@ export const UsersManagementPage: React.FC = () => {
             {/* Filter Pills */}
             <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar font-mono text-[10px]">
               {[
-                { id: 'all', label: 'All (842)' },
-                { id: 'admin', label: 'Admins / Judges (32)' },
-                { id: 'participant', label: 'Participants (809)' },
-                { id: 'suspended', label: 'Suspended (1)' },
+                { id: 'all', label: `All (${userCounts.all})` },
+                { id: 'admin', label: `Admins / Judges (${userCounts.admin})` },
+                { id: 'participant', label: `Participants (${userCounts.participant})` },
+                { id: 'suspended', label: `Suspended (${userCounts.suspended})` },
               ].map((p) => (
                 <button
                   key={p.id}
@@ -231,7 +233,6 @@ export const UsersManagementPage: React.FC = () => {
                     <div className="flex flex-col min-w-0">
                       <div className="flex items-center gap-1.5">
                         <span className="font-bold text-sm text-on-surface truncate">{u.name}</span>
-                        {u.verified && <CheckCircle2 className="w-3.5 h-3.5 text-primary shrink-0" />}
                       </div>
                       <span className="font-mono text-[11px] text-on-surface-variant truncate">{u.email}</span>
                     </div>
@@ -253,31 +254,15 @@ export const UsersManagementPage: React.FC = () => {
                 {/* Scope & Badges */}
                 <div className="flex flex-wrap items-center gap-1.5 pt-0.5 font-mono text-[10px]">
                   {u.role === 'admin' && (
-                    <>
-                      <span className="px-2 py-0.5 rounded bg-primary/15 text-primary font-semibold flex items-center gap-1">
-                        <ShieldCheck className="w-3 h-3" /> ADMIN / JUDGE
-                      </span>
-                      <span className="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant">
-                        {u.scope}
-                      </span>
-                      <span className="px-2 py-0.5 rounded bg-surface-container text-secondary flex items-center gap-1">
-                        <CheckCircle2 className="w-3 h-3" /> {u.evalsDone} Evals Done
-                      </span>
-                    </>
+                    <span className="px-2 py-0.5 rounded bg-primary/15 text-primary font-semibold flex items-center gap-1">
+                      <ShieldCheck className="w-3 h-3" /> ADMIN / JUDGE
+                    </span>
                   )}
 
                   {u.role === 'participant' && (
-                    <>
-                      <span className="px-2 py-0.5 rounded bg-surface-container-high text-on-surface-variant">
-                        PARTICIPANT
-                      </span>
-                      <span className="px-2 py-0.5 rounded bg-tertiary/10 text-tertiary">
-                        Team: {u.team}
-                      </span>
-                      <span className="px-2 py-0.5 rounded bg-surface-container text-outline">
-                        No Escalation
-                      </span>
-                    </>
+                    <span className="px-2 py-0.5 rounded bg-surface-container-high text-on-surface-variant">
+                      PARTICIPANT
+                    </span>
                   )}
 
                   {u.role === 'pending_admin' && (
@@ -358,7 +343,7 @@ export const UsersManagementPage: React.FC = () => {
             </div>
             <div className="flex items-center gap-1 px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-mono text-[10px] border border-outline-variant/20">
               <span className="w-1.5 h-1.5 rounded-full bg-secondary" />
-              <span>CHAIN: VALID</span>
+              <span>{auditLogs.length} EVENTS</span>
             </div>
           </div>
 
@@ -386,13 +371,7 @@ export const UsersManagementPage: React.FC = () => {
 
                 {log.reason && (
                   <div className="bg-surface-container-lowest p-2.5 rounded-xl flex flex-col gap-1 border border-outline-variant/20">
-                    <div className="flex items-center justify-between font-mono text-[10px]">
-                      <span className="text-outline">Criterion: {log.criterion}</span>
-                      <div className="flex items-center gap-1 text-secondary font-bold">
-                        <span className="line-through text-outline font-normal">{log.oldPoints}</span>
-                        <span>→ {log.newPoints}</span>
-                      </div>
-                    </div>
+                    <span className="font-mono text-[10px] text-outline">Entity: {log.criterion}</span>
                     <p className="text-[11px] text-on-surface-variant italic">"{log.reason}"</p>
                   </div>
                 )}
@@ -422,7 +401,7 @@ export const UsersManagementPage: React.FC = () => {
           <div className="bg-surface-container-lowest p-3.5 rounded-2xl flex items-start gap-2.5 border border-outline-variant/20 text-xs">
             <Lock className="w-4 h-4 text-outline shrink-0 mt-0.5" />
             <p className="text-on-surface-variant leading-relaxed text-[11px]">
-              All role mutations, score overrides, and publication triggers generate signed SHA-256 audit events and automatically notify affected stakeholders.
+              Role mutations and publication triggers generate audit events for review.
             </p>
           </div>
         </div>

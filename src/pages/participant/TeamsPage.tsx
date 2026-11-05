@@ -74,7 +74,7 @@ export const TeamsPage: React.FC = () => {
       const leaderMember: TeamMember = {
         userId: user.uid,
         email: user.email || '',
-        displayName: profile?.displayName || user.displayName || 'Lead Chemist',
+        displayName: profile?.displayName || user.displayName || user.email?.split('@')[0] || 'Team Leader',
         role: 'leader',
         joinedAt: new Date().toISOString(),
       };
@@ -129,7 +129,7 @@ export const TeamsPage: React.FC = () => {
       const newMember: TeamMember = {
         userId: user.uid,
         email: user.email || '',
-        displayName: profile?.displayName || user.displayName || 'Member',
+        displayName: profile?.displayName || user.displayName || user.email?.split('@')[0] || 'Member',
         role: 'member',
         joinedAt: new Date().toISOString(),
       };
@@ -254,7 +254,7 @@ export const TeamsPage: React.FC = () => {
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-bold text-stone-900">{m.displayName || 'Analyst'}</span>
+                          <span className="text-sm font-bold text-stone-900">{m.displayName || m.email || 'Member'}</span>
                           {isCurrent && (
                             <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold border border-emerald-200">
                               You

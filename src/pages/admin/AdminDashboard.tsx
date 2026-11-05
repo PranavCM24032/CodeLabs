@@ -155,7 +155,7 @@ export const AdminDashboard: React.FC = () => {
         </Link>
 
         <Link
-          to="/admin/analysis/sub_aurora"
+          to="/admin/judging"
           className="clay-card-orange p-6 group hover:-translate-y-1 transition-transform flex flex-col justify-between"
         >
           <div>

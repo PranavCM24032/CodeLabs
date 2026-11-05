@@ -19,13 +19,13 @@ export const RegisterPage: React.FC = () => {
   const { registerWithEmail, user } = useAuth();
   const navigate = useNavigate();
 
-  const [name, setName] = useState('Aarav Sharma');
-  const [email, setEmail] = useState('aarav.s@campus.edu');
-  const [githubHandle, setGithubHandle] = useState('@aarav-dev');
-  const [password, setPassword] = useState('SecurePass2025!');
-  const [confirmPassword, setConfirmPassword] = useState('SecurePass2025!');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [githubHandle, setGithubHandle] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [showPass, setShowPass] = useState(false);
-  const [termsAccepted, setTermsAccepted] = useState(true);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 

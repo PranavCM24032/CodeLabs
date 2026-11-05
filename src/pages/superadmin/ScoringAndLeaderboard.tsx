@@ -40,6 +40,7 @@ export const ScoringAndLeaderboardPage: React.FC = () => {
   const [published, setPublished] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [standings, setStandings] = useState<LeaderboardEntry[]>([]);
+  const [evaluationCount, setEvaluationCount] = useState(0);
   const [loadingStandings, setLoadingStandings] = useState(true);
 
   useEffect(() => {
@@ -78,6 +79,7 @@ export const ScoringAndLeaderboardPage: React.FC = () => {
           });
 
           setStandings(computed);
+          setEvaluationCount((evals || []).length);
         }
       } catch (err) {
         console.error('Error calculating standings:', err);
@@ -100,7 +102,7 @@ export const ScoringAndLeaderboardPage: React.FC = () => {
         status: 'published',
         standings,
         publishedAt: new Date().toISOString(),
-        publishedBy: user.email || 'superadmin@gittrack.internal',
+        publishedBy: user.email || '',
         updatedAt: new Date().toISOString(),
       };
 
@@ -108,13 +110,13 @@ export const ScoringAndLeaderboardPage: React.FC = () => {
 
       await recordAuditLog({
         actorId: user.uid,
-        actorEmail: user.email || 'superadmin@gittrack.internal',
+        actorEmail: user.email || '',
         action: 'LEADERBOARD_RELEASE_GATE_AUTHORIZED',
         entityType: 'Leaderboard',
         entityId: 'published',
         eventId: activeEvent.id,
-        details: 'Superadmin authorized cryptographic release gate of official leaderboard standings.',
-        reason: 'Superadmin compliance certification: all 142 submissions audited for Git cadence anomalies.',
+        details: 'Superadmin authorized release of official leaderboard standings.',
+        reason: 'Superadmin compliance certification for leaderboard release.',
       });
 
       setPublished(true);
@@ -150,6 +152,11 @@ export const ScoringAndLeaderboardPage: React.FC = () => {
     }
   };
 
+  const totalTeams = standings.length;
+  const scoredTeams = standings.filter((team) => team.status === 'Evaluated').length;
+  const pendingTeams = totalTeams - scoredTeams;
+  const coverage = totalTeams > 0 ? Math.round((scoredTeams / totalTeams) * 100) : 0;
+
   return (
     <div className="flex flex-col w-full pb-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 space-y-5 text-on-surface">
       {/* Top Release Gate Subheader */}
@@ -172,7 +179,7 @@ export const ScoringAndLeaderboardPage: React.FC = () => {
         </h1>
 
         <div className="flex items-center gap-2 mt-1">
-          <span className="font-mono text-xs text-tertiary">#IC-HACKGRID-2025</span>
+          <span className="font-mono text-xs text-tertiary">#{activeEvent?.slug?.toUpperCase() || 'NO EVENT'}</span>
           <span className="text-outline text-xs">•</span>
           <span className="text-xs text-on-surface-variant">Production Aggregation Pipeline</span>
         </div>
@@ -181,18 +188,18 @@ export const ScoringAndLeaderboardPage: React.FC = () => {
         <div className="grid grid-cols-3 gap-2 mt-3">
           <div className="bg-surface-container-low p-2.5 rounded-xl border border-outline-variant/20 flex flex-col">
             <span className="font-mono text-[9px] uppercase tracking-wider text-outline">COHORT COVERAGE</span>
-            <span className="font-bold text-sm text-secondary mt-0.5">100%</span>
-            <span className="font-mono text-[10px] text-on-surface-variant">142/142 Scored</span>
+            <span className="font-bold text-sm text-secondary mt-0.5">{coverage}%</span>
+            <span className="font-mono text-[10px] text-on-surface-variant">{scoredTeams}/{totalTeams} Scored</span>
           </div>
           <div className="bg-surface-container-low p-2.5 rounded-xl border border-outline-variant/20 flex flex-col">
-            <span className="font-mono text-[9px] uppercase tracking-wider text-outline">OVERRIDES</span>
-            <span className="font-bold text-sm text-tertiary mt-0.5">02 Active</span>
-            <span className="font-mono text-[10px] text-on-surface-variant">Audited & Signed</span>
+            <span className="font-mono text-[9px] uppercase tracking-wider text-outline">EVALUATIONS</span>
+            <span className="font-bold text-sm text-tertiary mt-0.5">{evaluationCount}</span>
+            <span className="font-mono text-[10px] text-on-surface-variant">Recorded</span>
           </div>
           <div className="bg-surface-container-low p-2.5 rounded-xl border border-outline-variant/20 flex flex-col">
             <span className="font-mono text-[9px] uppercase tracking-wider text-outline">SANITY CHECK</span>
-            <span className="font-bold text-sm text-primary mt-0.5">VERIFIED</span>
-            <span className="font-mono text-[10px] text-on-surface-variant">Zero Diffs</span>
+            <span className="font-bold text-sm text-primary mt-0.5">{totalTeams > 0 && pendingTeams === 0 ? 'READY' : 'PENDING'}</span>
+            <span className="font-mono text-[10px] text-on-surface-variant">{pendingTeams} Pending</span>
           </div>
         </div>
       </section>
@@ -222,7 +229,7 @@ export const ScoringAndLeaderboardPage: React.FC = () => {
             <h2 className="font-bold text-sm text-on-surface">Aggregation Matrix</h2>
           </div>
           <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-surface-container-high text-on-surface-variant font-semibold">
-            RULE-SET: v4.1
+            RULE-SET: DEFAULT
           </span>
         </div>
 
@@ -254,7 +261,7 @@ export const ScoringAndLeaderboardPage: React.FC = () => {
                 </span>
               </div>
               <p className="text-xs font-semibold text-on-surface mt-1.5">Strict Release Blocker</p>
-              <span className="font-mono text-[10px] text-on-surface-variant">0 Null Records Detected</span>
+              <span className="font-mono text-[10px] text-on-surface-variant">{pendingTeams} Pending Records</span>
             </div>
 
             <div className="bg-surface-container p-3 rounded-xl border border-outline-variant/20 flex flex-col justify-between">
@@ -309,48 +316,28 @@ export const ScoringAndLeaderboardPage: React.FC = () => {
             <h2 className="font-bold text-sm text-on-surface">Deliberation & Overrides</h2>
           </div>
           <span className="px-2 py-0.5 rounded bg-secondary-container/30 text-secondary font-mono text-[10px] font-semibold">
-            142/142 Closed
+            {totalTeams} Teams
           </span>
         </div>
 
         <div className="space-y-2">
-          <div className="bg-surface-container p-3 rounded-xl border border-outline-variant/20">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="px-1.5 py-0.5 rounded bg-tertiary-container/30 text-tertiary font-mono text-[10px]">
-                  TEAM #088
-                </span>
-                <span className="font-bold text-xs text-on-surface">HyperSync</span>
-              </div>
-              <span className="font-mono text-[11px] text-secondary font-bold">+1.2 PTS Adj.</span>
-            </div>
-            <p className="text-[11px] text-on-surface-variant mt-1 leading-relaxed">
-              Audit Reason: Disqualified bad-faith score from Judge #07 (Uncalibrated 40-pt skew resolved post-rebuttal).
-            </p>
-            <div className="flex items-center justify-between mt-2 pt-1 font-mono text-[10px] text-outline border-t border-outline-variant/10">
-              <span>By: sysadmin@gittrack.internal</span>
-              <span>SHA: 8cfb392a</span>
-            </div>
-          </div>
-
-          <div className="bg-surface-container p-3 rounded-xl border border-outline-variant/20">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="px-1.5 py-0.5 rounded bg-tertiary-container/30 text-tertiary font-mono text-[10px]">
-                  TEAM #104
-                </span>
-                <span className="font-bold text-xs text-on-surface">OmniMesh</span>
-              </div>
-              <span className="font-mono text-[11px] text-secondary font-bold">+0.8 PTS Adj.</span>
-            </div>
-            <p className="text-[11px] text-on-surface-variant mt-1 leading-relaxed">
-              Audit Reason: Restored SLA penalty after infrastructure DNS blackout was confirmed third-party outage.
-            </p>
-            <div className="flex items-center justify-between mt-2 pt-1 font-mono text-[10px] text-outline border-t border-outline-variant/10">
-              <span>By: sysadmin@gittrack.internal</span>
-              <span>SHA: 41ae19f0</span>
-            </div>
-          </div>
+          {standings.length === 0 ? (
+            <p className="text-[11px] text-on-surface-variant">No teams recorded for this event.</p>
+          ) : (
+            standings
+              .filter((team) => team.status !== 'Evaluated')
+              .map((team) => (
+                <div key={team.teamId} className="bg-surface-container p-3 rounded-xl border border-outline-variant/20">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-xs text-on-surface">{team.teamName}</span>
+                    <span className="font-mono text-[11px] text-tertiary font-bold">{team.status}</span>
+                  </div>
+                  <p className="text-[11px] text-on-surface-variant mt-1 leading-relaxed">
+                    Awaiting evaluation before the leaderboard can be released.
+                  </p>
+                </div>
+              ))
+          )}
         </div>
       </div>
 
@@ -458,7 +445,9 @@ export const ScoringAndLeaderboardPage: React.FC = () => {
             <Award className="w-4 h-4 text-primary" />
             <h2 className="font-bold text-sm text-on-surface">Final Cohort Standings (Preview)</h2>
           </div>
-          <span className="font-mono text-[10px] text-secondary font-semibold">Pre-flight Sync OK</span>
+          <span className="font-mono text-[10px] text-secondary font-semibold">
+            {totalTeams > 0 && pendingTeams === 0 ? 'Pre-flight Sync OK' : `${pendingTeams} Pending`}
+          </span>
         </div>
 
         <div className="space-y-2">
@@ -528,7 +517,7 @@ export const ScoringAndLeaderboardPage: React.FC = () => {
               className="w-4 h-4 mt-0.5 rounded bg-surface-container-lowest text-primary accent-primary shrink-0 cursor-pointer"
             />
             <span className="text-xs text-on-surface leading-relaxed">
-              I certify that all 142 submissions have been audited for Git cadence anomalies, outlier judge distributions, and duplicate syntax blocks.
+              I certify that all {totalTeams} team submissions have been audited for Git cadence anomalies, outlier judge distributions, and duplicate syntax blocks.
             </span>
           </label>
         </div>
@@ -571,9 +560,9 @@ export const ScoringAndLeaderboardPage: React.FC = () => {
         <div className="pt-2 flex items-center justify-between text-outline font-mono text-[10px] border-t border-outline-variant/10">
           <span className="flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-secondary" />
-            ECDSA P-256 HSM Ready
+            Release recorded in audit log
           </span>
-          <span>Key: SEC-PUB-2025-09A</span>
+          <span>{standings.length} Teams</span>
         </div>
       </div>
     </div>

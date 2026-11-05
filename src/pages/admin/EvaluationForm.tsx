@@ -33,7 +33,7 @@ export const EvaluationFormPage: React.FC = () => {
 
   const [team, setTeam] = useState<any | null>(null);
   const [submission, setSubmission] = useState<any | null>(null);
-  const [eventId, setEventId] = useState<string>('hack-2026-global');
+  const [eventId, setEventId] = useState<string>('');
 
   // Criteria Scores cleanly initialized
   const [scoreCrit1, setScoreCrit1] = useState<number>(0);
@@ -54,10 +54,10 @@ export const EvaluationFormPage: React.FC = () => {
     async function fetchTeamDetails() {
       try {
         const evts = await getEvents();
-        const activeEvtId = evts && evts.length > 0 ? evts[0].id : 'hack-2026-global';
+        const activeEvtId = evts && evts.length > 0 ? evts[0].id : '';
         setEventId(activeEvtId);
 
-        if (teamId) {
+        if (teamId && activeEvtId) {
           const [teamData, subData] = await Promise.all([
             getTeamById(activeEvtId, teamId),
             getSubmissionForTeam(activeEvtId, teamId),
@@ -82,17 +82,20 @@ export const EvaluationFormPage: React.FC = () => {
     setSubmitting(true);
     setFeedback(null);
     try {
-      const currentTeamName = team?.name || teamId || 'Team';
-      const evalId = `eval_${teamId || 'unknown'}_round_1`;
+      if (!teamId || !eventId || !submission || !user) {
+        throw new Error('Load a valid team, event, submission, and signed-in judge before saving.');
+      }
+      const currentTeamName = team?.name || teamId;
+      const evalId = `eval_${teamId}_round_1`;
       const payload: Evaluation = {
         id: evalId,
         eventId,
         roundId: 'round_1',
-        teamId: teamId || 'unknown',
+        teamId,
         teamName: currentTeamName,
-        submissionId: submission?.id || 'sub_default',
-        judgeId: user?.uid || 'usr_anonymous_judge',
-        judgeEmail: user?.email || 'judge@codelab.internal',
+        submissionId: submission.id,
+        judgeId: user.uid,
+        judgeEmail: user.email || '',
         schemaId: 'schema_round_1',
         schemaVersion: 1,
         scores: {
@@ -118,7 +121,7 @@ export const EvaluationFormPage: React.FC = () => {
       if (user) {
         await recordAuditLog({
           actorId: user.uid,
-          actorEmail: user.email || 'judge@codelab.internal',
+          actorEmail: user.email || '',
           action: `EVALUATION_${status.toUpperCase()}`,
           entityType: 'Evaluation',
           entityId: evalId,
@@ -157,7 +160,7 @@ export const EvaluationFormPage: React.FC = () => {
         </div>
         <div className="flex items-center gap-1 bg-surface-container-high px-2 py-0.5 rounded text-tertiary text-[10px]">
           <span className="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse" />
-          <span>AUTOSAVED 30s AGO</span>
+          <span>{feedback?.type === 'success' ? 'SAVED' : 'UNSAVED CHANGES'}</span>
         </div>
       </div>
 
@@ -207,7 +210,7 @@ export const EvaluationFormPage: React.FC = () => {
             </div>
             <div className="flex flex-col text-xs">
               <span className="font-semibold text-on-surface leading-tight">
-                Lead: {team?.members?.[0]?.displayName || team?.leaderEmail || 'Lead Member'}
+                Lead: {team?.members?.[0]?.displayName || team?.leaderEmail || 'No leader recorded'}
               </span>
               <span className="font-mono text-[10px] text-on-surface-variant leading-tight">
                 {submission?.repoUrl ? `Repo: ${submission.repoUrl}` : 'No repository linked yet'}
@@ -341,14 +344,14 @@ export const EvaluationFormPage: React.FC = () => {
           />
         </div>
 
-        {/* Verified Code Evidence Badge */}
+        {/* Linked repository reference */}
         <div className="flex items-center justify-between bg-surface-container-lowest px-3 py-2 rounded-xl border border-outline-variant/20">
           <div className="flex items-center gap-2 min-w-0">
             <Terminal className="w-4 h-4 text-tertiary" />
-            <span className="font-mono text-xs text-on-surface truncate">src/engine/ring_buffer.rs</span>
+            <span className="font-mono text-xs text-on-surface truncate">{submission?.repoUrl || 'No repository linked'}</span>
           </div>
           <span className="font-mono text-[10px] text-secondary bg-secondary-container/30 px-2 py-0.5 rounded font-semibold">
-            Safe Lockless
+            {submission?.branch || '—'}
           </span>
         </div>
 
@@ -476,7 +479,7 @@ export const EvaluationFormPage: React.FC = () => {
           </span>
         </div>
 
-        {/* Live CI Telemetry Card */}
+        {/* Submitted commit reference */}
         <div className="bg-surface-container-lowest rounded-xl p-3 flex items-center justify-between border border-outline-variant/20">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-surface-container-high flex items-center justify-center text-primary">
@@ -484,13 +487,15 @@ export const EvaluationFormPage: React.FC = () => {
             </div>
             <div className="flex flex-col">
               <span className="font-mono text-[10px] text-on-surface-variant uppercase">
-                Benchmark Telemetry (Auto CI)
+                Submitted Commit
               </span>
-              <span className="font-mono text-xs text-on-surface font-bold">120,412 msgs/sec @ 1.2ms p99</span>
+              <span className="font-mono text-xs text-on-surface font-bold">
+                {submission?.frozenCommitSha ? submission.frozenCommitSha.slice(0, 10) : 'No submission'}
+              </span>
             </div>
           </div>
           <span className="bg-secondary/20 text-secondary font-mono text-[10px] font-bold px-2 py-0.5 rounded border border-secondary/30">
-            PASSED SLA
+            {submission?.status?.toUpperCase() || 'NONE'}
           </span>
         </div>
 
@@ -593,7 +598,7 @@ export const EvaluationFormPage: React.FC = () => {
           className="w-full bg-surface-container-lowest rounded-xl p-3 text-on-surface text-xs border border-outline-variant/30 focus:outline-none"
         />
         <div className="flex items-center justify-between pt-1 text-on-surface-variant font-mono text-[10px]">
-          <span>Logged by: Dr. E. Vance (#04)</span>
+          <span>Logged by: {user?.email || 'Unknown judge'}</span>
           <span className="text-tertiary flex items-center gap-1">
             <ShieldCheck className="w-3.5 h-3.5" />
             <span>PGP-Secured</span>
@@ -626,7 +631,7 @@ export const EvaluationFormPage: React.FC = () => {
           </div>
           <div className="flex items-center justify-center gap-1.5 text-center text-outline font-mono text-[10px]">
             <Lock className="w-3 h-3 text-tertiary" />
-            <span>Submission locks evaluation and signs payload with Judge Node #04 key.</span>
+            <span>Submission locks evaluation and signs the payload with your judge account.</span>
           </div>
         </div>
       </div>

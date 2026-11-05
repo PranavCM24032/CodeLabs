@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { saveEvaluationSchema, recordAuditLog } from '../../services/firestoreService';
+import { getEvents, saveEvaluationSchema, recordAuditLog } from '../../services/firestoreService';
 import { SchemaCriterion } from '../../types';
 
 export const SchemaBuilderPage: React.FC = () => {
@@ -9,8 +9,30 @@ export const SchemaBuilderPage: React.FC = () => {
   const [doubleBlind, setDoubleBlind] = useState(true);
   const [schemaName, setSchemaName] = useState('Technical & Architecture Evaluation Schema');
   const [roundName, setRoundName] = useState('Round 1: Preliminary Code & Prototype Audit');
+  const [activeEventId, setActiveEventId] = useState('');
+  const [activeEventTitle, setActiveEventTitle] = useState('');
+  const [roundId, setRoundId] = useState('round_1');
+  const [schemaId, setSchemaId] = useState('');
+  const [schemaVersion, setSchemaVersion] = useState(1);
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+
+  useEffect(() => {
+    getEvents()
+      .then((events) => {
+        const event = events?.[0];
+        if (!event) return;
+        const round = event.rounds?.[0];
+        setActiveEventId(event.id);
+        setActiveEventTitle(event.title);
+        if (round) {
+          setRoundId(round.id);
+          setRoundName(round.name);
+        }
+        setSchemaId(`schema_${event.id}_${round?.id || 'round_1'}`);
+      })
+      .catch((err) => console.error('Failed to load event for schema builder:', err));
+  }, []);
 
   const [criteria, setCriteria] = useState<SchemaCriterion[]>([
     {
@@ -90,28 +112,32 @@ export const SchemaBuilderPage: React.FC = () => {
   };
 
   const handleSave = async () => {
+    if (!activeEventId || !schemaId || !user) {
+      console.error('Cannot save schema without an active event and signed-in user.');
+      return;
+    }
     setSaving(true);
     try {
-      await saveEvaluationSchema('event-hackgrid-2025', {
-        id: 'dev-sch-409',
-        eventId: 'event-hackgrid-2025',
-        roundId: 'round_1',
+      await saveEvaluationSchema(activeEventId, {
+        id: schemaId,
+        eventId: activeEventId,
+        roundId,
         name: schemaName,
-        version: 1,
+        version: schemaVersion,
         status: 'published',
         totalMaxMarks: totalWeight,
         criteria,
-        createdBy: user?.uid || 'superadmin',
+        createdBy: user.uid,
         createdAt: new Date().toISOString(),
         publishedAt: new Date().toISOString(),
       });
-      if (user?.uid) {
+      if (user.uid) {
         await recordAuditLog({
           actorId: user.uid,
-          actorEmail: user.email || 'sysadmin@gittrack.internal',
+          actorEmail: user.email || '',
           action: 'SCHEMA_UPDATE',
           entityType: 'schema',
-          entityId: 'dev-sch-409',
+          entityId: schemaId,
           details: JSON.stringify({ name: schemaName, totalWeight }),
         });
       }
@@ -133,14 +159,14 @@ export const SchemaBuilderPage: React.FC = () => {
             <div className="flex flex-col min-w-0">
               <div className="flex items-center gap-1.5 flex-wrap">
                 <span className="px-1.5 py-0.5 rounded bg-surface-container-high text-primary font-code-sm text-code-sm uppercase tracking-wide">
-                  DRAFT v2.5
+                  DRAFT v{schemaVersion}
                 </span>
                 <span className="px-1.5 py-0.5 rounded bg-surface-container-highest text-on-surface-variant font-code-sm text-code-sm">
-                  DEV-SCH-409
+                  {schemaId || 'NO EVENT'}
                 </span>
               </div>
               <h1 className="font-headline-sm text-headline-sm text-on-surface mt-1 truncate font-bold">
-                Schema Builder: InterCollege HackGrid 2025 (Round 1)
+                Schema Builder: {activeEventTitle || 'No active event'} ({roundName})
               </h1>
             </div>
             <button
@@ -437,12 +463,14 @@ export const SchemaBuilderPage: React.FC = () => {
           <div className="bg-surface-container-low rounded-xl p-4 shadow-md border border-surface-container space-y-3">
             <div className="flex items-center justify-between text-xs text-on-surface-variant font-code-sm">
               <span>FORMAT: JSON SPECIFICATION SCHEMA</span>
-              <span className="text-secondary">VALIDATED</span>
+              <span className={totalWeight === 100 ? 'text-secondary' : 'text-error'}>
+                {totalWeight === 100 ? 'VALIDATED' : 'INCOMPLETE'}
+              </span>
             </div>
             <pre className="p-4 bg-surface-container-lowest rounded-lg font-code-sm text-code-sm text-primary overflow-x-auto">
               {JSON.stringify(
                 {
-                  id: 'dev-sch-409',
+                  id: schemaId || 'schema',
                   schemaName,
                   roundContext: roundName,
                   doubleBlind,

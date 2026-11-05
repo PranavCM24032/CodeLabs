@@ -70,7 +70,7 @@ export const EventWizardPage: React.FC = () => {
         maxTeamSize: Number(maxTeamSize),
         status,
         rounds,
-        createdBy: user.email || 'superadmin',
+        createdBy: user.email || '',
         createdAt: new Date().toISOString(),
       };
 

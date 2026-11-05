@@ -158,26 +158,35 @@ export const SubmissionPage: React.FC = () => {
 
   const handleManualLock = async () => {
     if (!activeEvent || !user) return;
+    if (!userTeam) {
+      setFeedback({ type: 'error', text: 'Join or create a team before submitting a project.' });
+      return;
+    }
+    if (!repoUrl.trim() || !commitSha.trim()) {
+      setFeedback({ type: 'error', text: 'Add a repository link and load a valid commit before submitting.' });
+      return;
+    }
     setLocking(true);
     setFeedback(null);
 
     try {
       const subId = submission?.id || `sub_${Date.now()}`;
+      const lastCommit = insights?.lastCommit;
       const newSubmission: Submission = {
         id: subId,
-        teamId: userTeam?.id || 'team_bytecrafters',
-        teamName: userTeam?.name || 'ByteCrafters',
+        teamId: userTeam.id,
+        teamName: userTeam.name,
         eventId: activeEvent.id,
-        problemId: userTeam?.problemId || 'prob_ai',
+        problemId: userTeam.problemId,
         provider,
         repoUrl: repoUrl.trim(),
         liveProjectUrl: liveProjectUrl.trim() || undefined,
         branch: branch.replace(' (protected)', ''),
-        frozenCommitSha: commitSha,
-        commitMessage: 'Sync: Complete video pipeline streaming service',
-        authorName: user?.displayName || 'Alex Zhang',
-        authorEmail: user?.email || 'alex@bytecrafters.org',
-        committedAt: new Date(Date.now() - 12 * 60000).toISOString(),
+        frozenCommitSha: commitSha.trim(),
+        commitMessage: lastCommit?.message || '',
+        authorName: lastCommit?.author || user.displayName || '',
+        authorEmail: user.email || '',
+        committedAt: lastCommit?.authoredAt || new Date().toISOString(),
         snapshotAt: new Date().toISOString(),
         status: 'submitted',
         submittedBy: user.uid,
@@ -215,6 +224,11 @@ export const SubmissionPage: React.FC = () => {
       setLocking(false);
     }
   };
+
+  const deadline = activeEvent ? new Date(activeEvent.submissionDeadline) : null;
+  const msLeft = deadline ? deadline.getTime() - Date.now() : 0;
+  const deadlineLabel = deadline ? deadline.toLocaleString() : 'No active event';
+  const timeLeft = !deadline ? '—' : msLeft <= 0 ? 'Closed' : `${Math.floor(msLeft / 3600000)}h ${Math.floor((msLeft % 3600000) / 60000)}m left`;
 
   return (
     <div className="flex flex-col w-full px-4 sm:px-6 lg:px-8 py-6 max-w-4xl mx-auto space-y-6 text-on-surface">
@@ -268,13 +282,13 @@ export const SubmissionPage: React.FC = () => {
                 Submission deadline
               </div>
               <div className="font-bold text-sm sm:text-base text-on-surface">
-                Today, 11:59 PM EST
+                {deadlineLabel}
               </div>
             </div>
           </div>
           <div className="flex flex-col items-end">
             <span className="px-2.5 py-0.5 rounded bg-primary-container/20 text-primary font-mono text-xs font-semibold tracking-wide border border-primary-container/30">
-              06h 38m left
+              {timeLeft}
             </span>
             <span className="font-mono text-[10px] text-on-surface-variant mt-0.5">Automated Seal</span>
           </div>
@@ -289,7 +303,7 @@ export const SubmissionPage: React.FC = () => {
                 Lock submitted version
               </div>
               <div className="font-mono text-[10px] text-on-surface-variant truncate">
-                Snapshot head commit at exactly 23:59:00
+                Snapshot the selected commit when you submit
               </div>
             </div>
           </div>
@@ -330,7 +344,7 @@ export const SubmissionPage: React.FC = () => {
             </div>
             <GitBranch className="w-6 h-6 text-primary mb-1" />
             <span className="font-bold text-xs">GitHub</span>
-            <span className="font-mono text-[10px] text-secondary">Connected</span>
+            <span className="font-mono text-[10px] text-secondary">Available</span>
           </button>
 
           {/* GitLab */}
@@ -372,7 +386,7 @@ export const SubmissionPage: React.FC = () => {
             <Terminal className="w-4 h-4 text-primary" />
             <span className="font-bold text-sm text-on-surface">Project links</span>
           </div>
-          <span className="font-mono text-[11px] text-on-surface-variant">Team: {userTeam?.name || 'ByteCrafters'}</span>
+          <span className="font-mono text-[11px] text-on-surface-variant">Team: {userTeam?.name || 'No team'}</span>
         </div>
 
         {/* Remote URL */}
@@ -424,9 +438,11 @@ export const SubmissionPage: React.FC = () => {
                 onChange={(e) => setBranch(e.target.value)}
                 className="w-full bg-surface-container-lowest text-on-surface font-mono text-xs rounded-xl pl-9 pr-8 py-2.5 appearance-none focus:outline-none border border-outline-variant/30"
               >
-                <option value="main (protected)">main (protected)</option>
-                <option value="release/v1.0">release/v1.0</option>
-                <option value="hackathon-final">hackathon-final</option>
+                {Array.from(new Set([insights?.defaultBranch || 'main', 'main'])).map((name) => (
+                  <option key={name} value={name}>
+                    {name}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
@@ -435,7 +451,7 @@ export const SubmissionPage: React.FC = () => {
             <div className="flex items-center justify-between">
               <label className="font-mono text-[10px] text-on-surface-variant uppercase">Target Commit SHA</label>
               <span className="font-mono text-[10px] text-primary flex items-center gap-1 font-semibold">
-                <CheckCircle2 className="w-3 h-3 text-primary" /> Webhook Synchronized
+                <CheckCircle2 className="w-3 h-3 text-primary" /> {insights?.lastCommit ? 'Webhook synchronized' : 'Load a repository to sync'}
               </span>
             </div>
             <div className="relative flex items-center">
@@ -512,43 +528,35 @@ export const SubmissionPage: React.FC = () => {
       <div className="flex flex-col space-y-2">
         <div className="flex items-center justify-between">
           <h2 className="font-bold text-sm text-on-surface">Snapshot Log History</h2>
-          <span className="font-mono text-[10px] text-on-surface-variant">3 events</span>
+          <span className="font-mono text-[10px] text-on-surface-variant">{submission ? '1 event' : '0 events'}</span>
         </div>
         <div className="rounded-2xl bg-surface-container-low p-4 space-y-4 border border-outline-variant/20">
-          <div className="flex items-start gap-3 relative">
-            <div className="flex flex-col items-center">
-              <div className="w-3 h-3 rounded-full bg-primary ring-4 ring-primary/20" />
-              <div className="w-0.5 h-10 bg-surface-container-highest my-1" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-primary">Snapshot v2 (Current Head)</span>
-                <span className="font-mono text-[10px] text-on-surface-variant">12m ago</span>
+          {submission ? (
+            <div className="flex items-start gap-3">
+              <div className="flex flex-col items-center">
+                <div className="w-3 h-3 rounded-full bg-primary ring-4 ring-primary/20" />
               </div>
-              <p className="text-[11px] text-on-surface-variant mt-0.5 truncate">
-                Sync: Complete video pipeline streaming service
-              </p>
-              <div className="inline-flex items-center gap-1.5 mt-1 font-mono text-[10px] bg-surface-container px-2 py-0.5 rounded text-on-surface">
-                <GitBranch className="w-3 h-3 text-primary" />
-                <span className="text-primary font-semibold">7a82f0e</span>
-                <span className="text-outline">·</span>
-                <span>+142 / -18</span>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-primary">Snapshot (Current Head)</span>
+                  <span className="font-mono text-[10px] text-on-surface-variant">
+                    {new Date(submission.snapshotAt).toLocaleString()}
+                  </span>
+                </div>
+                <p className="text-[11px] text-on-surface-variant mt-0.5 truncate">
+                  {submission.commitMessage || 'No commit message available'}
+                </p>
+                <div className="inline-flex items-center gap-1.5 mt-1 font-mono text-[10px] bg-surface-container px-2 py-0.5 rounded text-on-surface">
+                  <GitBranch className="w-3 h-3 text-primary" />
+                  <span className="text-primary font-semibold">{submission.frozenCommitSha.slice(0, 7)}</span>
+                  <span className="text-outline">·</span>
+                  <span>{submission.branch}</span>
+                </div>
               </div>
             </div>
-          </div>
-
-          <div className="flex items-start gap-3">
-            <div className="w-2.5 h-2.5 rounded-full bg-outline mt-1" />
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-on-surface">Initial Webhook Hooked</span>
-                <span className="font-mono text-[10px] text-on-surface-variant">18h ago</span>
-              </div>
-              <p className="text-[11px] text-on-surface-variant mt-0.5 truncate">
-                Repository attached to HackGrid 2025 event cluster
-              </p>
-            </div>
-          </div>
+          ) : (
+            <p className="text-xs text-on-surface-variant">No snapshots submitted yet.</p>
+          )}
         </div>
       </div>
 
@@ -564,7 +572,7 @@ export const SubmissionPage: React.FC = () => {
           <span>{locking ? 'Locking Snapshot SHA...' : 'Submit & Lock Current SHA'}</span>
         </button>
         <p className="text-center font-mono text-[10px] text-on-surface-variant">
-          You can update your submission until the code freeze at 23:59:00 EST.
+          You can update your submission until the deadline: {deadlineLabel}.
         </p>
       </div>
 
@@ -578,17 +586,19 @@ export const SubmissionPage: React.FC = () => {
             <div className="text-center space-y-1">
               <h3 className="font-bold text-base text-on-surface">SHA Cryptographically Frozen</h3>
               <p className="text-xs text-on-surface-variant">
-                Commit <span className="font-mono text-primary font-bold">7a82f0e</span> has been successfully logged in GitTrack ledger for HackGrid 2025.
+                Commit <span className="font-mono text-primary font-bold">{submission?.frozenCommitSha.slice(0, 7) || commitSha.slice(0, 7)}</span> has been submitted for {activeEvent?.title || 'this event'}.
               </p>
             </div>
             <div className="bg-surface-container-low p-3 rounded-xl font-mono text-[11px] text-on-surface-variant space-y-1.5 border border-outline-variant/20">
               <div className="flex justify-between">
                 <span>Timestamp:</span>
-                <span className="text-on-surface">{new Date().toLocaleTimeString()} UTC</span>
+                <span className="text-on-surface">
+                  {submission ? new Date(submission.snapshotAt).toLocaleString() : new Date().toLocaleString()}
+                </span>
               </div>
               <div className="flex justify-between">
-                <span>Ledger Seal:</span>
-                <span className="text-secondary font-mono">0x9F42...C8B</span>
+                <span>Branch:</span>
+                <span className="text-secondary font-mono">{submission?.branch || branch}</span>
               </div>
             </div>
             <button
