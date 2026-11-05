@@ -43,6 +43,32 @@ function getPageCount(linkHeader: string | null): number | null {
   return last ? Number(last[1]) : null;
 }
 
+async function readJson(response: globalThis.Response | null): Promise<any> {
+  if (!response || !response.ok) return null;
+  try {
+    const text = await response.text();
+    return text ? JSON.parse(text) : null;
+  } catch {
+    return null;
+  }
+}
+
+async function readStats(url: string, headers: Record<string, string>): Promise<any> {
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const response = await fetch(url, { headers });
+      if (response.status === 202) {
+        await new Promise((resolve) => setTimeout(resolve, 800));
+        continue;
+      }
+      return await readJson(response);
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
+
 // Repository metadata only. Git history cannot reliably tell whether code is human- or AI-written;
 // plagiarism detection needs a configured comparison corpus and is therefore reported separately.
 app.get(['/api/repository-insights', '/repository-insights'], async (req: Request, res: Response) => {
@@ -73,9 +99,14 @@ app.get(['/api/repository-insights', '/repository-insights'], async (req: Reques
       return res.status(502).json({ error: 'GitHub repository metadata could not be loaded.' });
     }
 
-    const repo = await repoResponse.json() as { default_branch: string; updated_at: string; license?: { spdx_id?: string } };
-    const commits = await commitsResponse.json() as Array<{ sha: string; commit: { message: string; author: { date: string; name: string } } }>;
-    const contributorsRaw = await contributorsResponse.json() as Array<{ login?: string; name?: string; contributions: number; avatar_url?: string }>;
+    const repo = (await readJson(repoResponse)) as { default_branch: string; updated_at: string; license?: { spdx_id?: string } } | null;
+    const commitsRaw = await readJson(commitsResponse);
+    const contributorsRawRaw = await readJson(contributorsResponse);
+    if (!repo) {
+      return res.status(502).json({ error: 'GitHub repository metadata could not be loaded.' });
+    }
+    const commits = (Array.isArray(commitsRaw) ? commitsRaw : []) as Array<{ sha: string; commit: { message: string; author: { date: string; name: string } } }>;
+    const contributorsRaw = (Array.isArray(contributorsRawRaw) ? contributorsRawRaw : []) as Array<{ login?: string; name?: string; contributions: number; avatar_url?: string }>;
     const totalCommits = getPageCount(commitsResponse.headers.get('link')) ?? commits.length;
     const contributors: GitHubContributor[] = contributorsRaw
       .map((item) => ({ login: item.login || item.name || 'Unknown contributor', contributions: item.contributions, avatarUrl: item.avatar_url }))
@@ -93,12 +124,25 @@ app.get(['/api/repository-insights', '/repository-insights'], async (req: Reques
       fetch(`${baseUrl}/stats/commit_activity`, { headers }),
       fetch(`${baseUrl}/stats/code_frequency`, { headers }),
     ]);
-    const firstCommit = firstCommitResponse?.ok ? (await firstCommitResponse.json() as Array<{ commit: { author: { date: string } } }>)[0] : null;
-    const languages = languagesResponse.ok ? await languagesResponse.json() as Record<string, number> : {};
-    const rootFiles = rootFilesResponse.ok ? await rootFilesResponse.json() as Array<{ name: string }> : [];
+    const firstCommitRaw = await readJson(firstCommitResponse);
+    const firstCommit = Array.isArray(firstCommitRaw) ? firstCommitRaw[0] : null;
+    const languagesRaw = await readJson(languagesResponse);
+    const languages = languagesRaw && typeof languagesRaw === 'object' && !Array.isArray(languagesRaw) ? (languagesRaw as Record<string, number>) : {};
+    const rootFilesRaw = await readJson(rootFilesResponse);
+    const rootFiles = (Array.isArray(rootFilesRaw) ? rootFilesRaw : []) as Array<{ name: string }>;
     const rootNames = new Set(rootFiles.map((file) => file.name.toLowerCase()));
-    const activity = commitActivityResponse.ok ? await commitActivityResponse.json() as Array<{ week: number; total: number }> : [];
-    const codeFrequency = codeFrequencyResponse.ok ? await codeFrequencyResponse.json() as Array<[number, number, number]> : [];
+    const activityRaw = await readJson(commitActivityResponse);
+    let activity = (Array.isArray(activityRaw) ? activityRaw : []) as Array<{ week: number; total: number }>;
+    if (activity.length === 0) {
+      const retry = await readStats(`${baseUrl}/stats/commit_activity`, headers);
+      if (Array.isArray(retry)) activity = retry;
+    }
+    const codeFrequencyRaw = await readJson(codeFrequencyResponse);
+    let codeFrequency = (Array.isArray(codeFrequencyRaw) ? codeFrequencyRaw : []) as Array<[number, number, number]>;
+    if (codeFrequency.length === 0) {
+      const retry = await readStats(`${baseUrl}/stats/code_frequency`, headers);
+      if (Array.isArray(retry)) codeFrequency = retry;
+    }
 
     return res.json({
       repository: `${target.owner}/${target.repo}`,
@@ -113,7 +157,7 @@ app.get(['/api/repository-insights', '/repository-insights'], async (req: Reques
       } : null,
       contributors: contributors.map((item) => ({ ...item, percentage: contributionTotal ? Math.round((item.contributions / contributionTotal) * 100) : 0 })),
       firstCommitAt: firstCommit?.commit.author.date || null,
-      pullRequests: pullRequestsResponse.ok ? (getPageCount(pullRequestsResponse.headers.get('link')) ?? 0) : null,
+      pullRequests: pullRequestsResponse.ok ? (getPageCount(pullRequestsResponse.headers.get('link')) ?? 1) : null,
       branches: branchesResponse.ok ? (getPageCount(branchesResponse.headers.get('link')) ?? 1) : null,
       languages: Object.entries(languages).sort(([, a], [, b]) => b - a).slice(0, 5).map(([name, bytes]) => ({ name, bytes })),
       projectHealth: {
